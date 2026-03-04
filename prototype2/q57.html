@@ -154,24 +154,17 @@
             <div class="info-item"> <label for="currentShift">Shift:</label> <select id="currentShift"> <option>Day Shift</option> <option>Night Shift</option> </select> </div>
         </div>
         <hr>
-        <div class="header-with-add-button">
-            <h2>Manage Inventory</h2>
-            <div class="header-button-group">
-                <button id="lockSystemButton" class="add-item-icon-btn" title="System Locked" style="background-color: #dc3545; margin-right: 2px;"><i class="fas fa-lock"></i></button>
-                <button id="darkModeToggle" class="add-item-icon-btn" title="Toggle Dark Mode" style="background-color: #6c757d; margin-right: 2px;"><i class="fas fa-moon"></i></button>
-                <button id="fileOpsButton" class="add-item-icon-btn" title="File Operations"><i class="fas fa-folder-open"></i></button>
-                <button id="openAddItemModalButton" class="add-item-icon-btn" title="Add New Item">+</button>
-            </div>
+        <div class="floating-action-buttons" style="position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 1000;">
+            <button id="lockSystemButton" class="add-item-icon-btn" title="System Locked" style="background-color: #dc3545;"><i class="fas fa-lock"></i></button>
+            <button id="darkModeToggle" class="add-item-icon-btn" title="Toggle Dark Mode" style="background-color: #6c757d;"><i class="fas fa-moon"></i></button>
+            <button id="fileOpsButton" class="add-item-icon-btn" title="File Operations"><i class="fas fa-folder-open"></i></button>
+            <button id="openAddItemModalButton" class="add-item-icon-btn" title="Add New Item">+</button>
         </div>
         <div id="errorMessage" class="error-message"></div>
-        <hr>
-        <h2>Data Operations</h2>
-        <div class="main-buttons">
-            <button id="openImportModalButton"><i class="fas fa-file-import"></i> Import Data</button>
+        <div class="main-buttons" style="justify-content: center;">
             <button id="openBulkDeliveriesModalButton" style="background-color: #6f42c1;"><i class="fas fa-shipping-fast"></i> Bulk Deliveries</button>
             <button id="openBulkWithdrawModalButton" style="background-color: #fd7e14;"><i class="fas fa-dolly-flatbed"></i> Bulk Withdraw</button>
             <button id="openVarianceModalButton" style="background-color: #6610f2;"><i class="fas fa-balance-scale"></i> Variance Tracker</button>
-            <button id="clearInventoryButton" style="background-color: #dc3545;"><i class="fas fa-trash-alt"></i> Clear Data</button>
         </div>
         <hr>
         <div class="filter-section">
@@ -314,11 +307,13 @@
                 </div>
                 <small style="color: #6b7280; text-align: center;">Items with transactions between these dates will be marked.</small>
             </div>
-            <div class="modal-actions" style="justify-content: center;">
+            <div class="modal-actions" style="justify-content: center; flex-wrap: wrap; gap: 10px;">
+                <button id="openImportModalButton"><i class="fas fa-file-import"></i> Import Data</button>
                 <button id="backupButton"><i class="fas fa-download"></i> Backup</button>
                 <button id="restoreButton"><i class="fas fa-upload"></i> Restore</button>
                 <button id="exportExcelButton"><i class="fas fa-file-excel"></i> Export Report</button>
                 <button id="printInventoryButton" style="background-color: #f39c12;"><i class="fas fa-print"></i> Print</button>
+                <button id="clearInventoryButton" style="background-color: #dc3545;"><i class="fas fa-trash-alt"></i> Clear Data</button>
             </div>
             <div class="modal-actions">
                 <button id="cancelFileOps">Cancel</button>
@@ -1393,9 +1388,9 @@
 
         fileOpsButton.addEventListener('click', () => { checkAccess(() => { fileOpsModal.style.display = 'block'; }); });
         openAddItemModalButton.addEventListener('click', () => { checkAccess(() => { addItemModal.style.display = 'block'; addItemCodeInput.value = ''; addItemBreakdownInput.value = ''; addItemErrorMessage.textContent = ''; addItemCodeInput.focus(); }); });
-        openImportModalButton.addEventListener('click', () => { checkAccess(() => { const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = ".xlsx, .xls"; fileInput.onchange = e => handleFileSelect(e.target.files[0]); fileInput.click(); }); });
+        openImportModalButton.addEventListener('click', () => { checkAccess(() => { fileOpsModal.style.display = 'none'; const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = ".xlsx, .xls"; fileInput.onchange = e => handleFileSelect(e.target.files[0]); fileInput.click(); }); });
 
-        clearInventoryButton.addEventListener('click', () => { checkAccess(() => { clearChoiceModal.style.display = 'block'; }); });
+        clearInventoryButton.addEventListener('click', () => { checkAccess(() => { fileOpsModal.style.display = 'none'; clearChoiceModal.style.display = 'block'; }); });
         clearHistoryButton.addEventListener('click', () => { checkAccess(() => { if (confirm('Are you sure?')) { transactionHistory = []; historyTableBody.innerHTML = ''; localStorage.removeItem('transactionHistory'); logTransaction('CLEAR HISTORY', '-', 'Transaction history cleared.'); } }); });
         inventoryTableBody.addEventListener('click', (event) => { const targetCell = event.target.closest('.editable-breakdown'); if (targetCell) {
             checkAccess(() => {
