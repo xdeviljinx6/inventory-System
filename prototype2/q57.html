@@ -867,12 +867,14 @@
             });
 
             const printWindow = window.open('', '_blank');
+            const totalCols = showMarking ? 4 : 3;
             printWindow.document.write(`
                 <html>
                 <head>
                     <title>Print Inventory</title>
                     <style>
                         body { font-family: Arial, sans-serif; margin: 10px 20px; color: #000; }
+                        .header-row td { border: none !important; padding: 0 !important; background-color: transparent !important; }
                         .header { text-align: center; font-weight: bold; font-size: 1.1em; margin-bottom: 2px; }
                         .info-line { display: flex; justify-content: space-between; font-weight: bold; border-top: 2px solid black; border-bottom: 2px solid black; padding: 2px 0; margin-bottom: 5px; font-size: 0.95em; }
                         .section-title { color: red; text-decoration: underline; font-weight: bold; margin-top: 5px; margin-bottom: 5px; font-size: 1.05em; }
@@ -887,18 +889,23 @@
                         @media print {
                             @page { margin: 0.5cm; }
                             body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                            thead { display: table-header-group; }
                         }
                     </style>
                 </head>
                 <body>
-                    <div class="header">PACKAGING MATERIALS DAILY COUNT SHEET - COHIN (BLDG. 1&2)</div>
-                    <div class="info-line">
-                        <span>Date / Shift : ${formattedDate} ${shiftAbbr}</span>
-                        <span>TIME COUNTED: ${formattedTime}</span>
-                    </div>
-                    <div class="section-title">LABELS & PLASTIC</div>
                     <table>
                         <thead>
+                            <tr class="header-row">
+                                <td colspan="${totalCols}">
+                                    <div class="header">PACKAGING MATERIALS DAILY COUNT SHEET - COHIN (BLDG. 1&2)</div>
+                                    <div class="info-line">
+                                        <span>Date / Shift : ${formattedDate} ${shiftAbbr}</span>
+                                        <span>TIME COUNTED: ${formattedTime}</span>
+                                    </div>
+                                    <div class="section-title">LABELS & PLASTIC</div>
+                                </td>
+                            </tr>
                             <tr>
                                 <th style="text-align: center; width: 30px;">NO.</th>
                                 ${showMarking ? '<th style="text-align: center; width: 30px;">M</th>' : ''}
