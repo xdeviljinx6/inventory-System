@@ -148,6 +148,7 @@
         body.dark-mode .bulk-del-item input { background-color: #1f2937; color: #fff; border-color: #4b5563; }
         body.dark-mode .bulk-del-item input::placeholder { color: #9ca3af; }
         body.dark-mode #movementFilterOptions { background-color: #2d3748 !important; color: #fff; }
+        body.dark-mode #secondaryFilters { border-top-color: #4b5563 !important; }
 
         .highlight { background-color: #ffeb3b; color: #000; padding: 0 2px; border-radius: 2px; font-weight: bold; }
         body.dark-mode .highlight { background-color: #f59e0b; color: #000; }
@@ -177,35 +178,60 @@
         </div>
         <hr>
         <div class="filter-section">
-            <div class="filter-header"><i class="fas fa-filter"></i> Filter & <i class="fas fa-sort-alpha-down"></i> Sort Inventory</div>
-            <div class="filter-group"> <label for="searchBar"><i class="fas fa-search"></i> Search:</label> <input type="text" id="searchBar" placeholder="Type to search..."> </div>
-            <div class="filter-group"> <label for="itemTypeFilter"><i class="fas fa-box"></i> Item Type:</label> <select id="itemTypeFilter"> <option value="ALL">All</option><option value="LBL">Labels</option><option value="CTN">Carton</option><option value="PLASTIC">Plastic</option><option value="OTHERS">Other</option> </select> </div>
-            <div class="filter-group"> <label for="remarksFilter"><i class="fas fa-comment"></i> Remarks:</label> <select id="remarksFilter"> <option value="ALL">All</option><option value="HOLD">Hold</option><option value="APPROVED">Approved</option><option value="FIRSTOUT_OLD">First Out/Old</option><option value="NO_REMARK">No Remark</option><option value="OTHER_REMARKS">Other</option> </select> </div>
-            <div class="filter-group"> <label for="dataPresenceFilter"><i class="fas fa-database"></i> Qty Data:</label> <select id="dataPresenceFilter"> <option value="ALL">All</option><option value="WITH_DATA">With Data</option><option value="WITHOUT_DATA">No Data</option> </select> </div>
-            <div class="filter-group"> <label for="materialCodeSort"><i class="fas fa-sort-alpha-down"></i> Sort Code:</label> <select id="materialCodeSort"> <option value="NONE">Unsorted</option><option value="ASC">A-Z</option><option value="DESC">Z-A</option> </select> </div>
-            <div class="filter-group" style="width: 100%; justify-content: center; border-top: 1px solid #eee; padding-top: 15px; margin-top: 10px;">
-                <label style="cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px;">
-                    <input type="checkbox" id="enableMovementFilter" style="width: 18px; height: 18px; cursor: pointer;">
-                    Mark items with movement (★)
-                </label>
+            <div class="filter-header" style="margin-bottom: 10px;"><i class="fas fa-filter"></i> Filter & <i class="fas fa-sort-alpha-down"></i> Sort Inventory</div>
+
+            <div class="primary-filters" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: center; width: 100%;">
+                <div class="filter-group" style="flex: 1; min-width: 250px;">
+                    <label for="searchBar"><i class="fas fa-search"></i> Search:</label>
+                    <input type="text" id="searchBar" placeholder="Type to search..." style="padding: 6px; font-size: 0.9em;">
+                </div>
+                <div class="filter-group">
+                    <label for="dataPresenceFilter"><i class="fas fa-database"></i> Qty Data:</label>
+                    <select id="dataPresenceFilter" style="padding: 6px; font-size: 0.9em;"> <option value="ALL">All</option><option value="WITH_DATA">With Data</option><option value="WITHOUT_DATA">No Data</option> </select>
+                </div>
+                <div class="filter-group">
+                    <label for="materialCodeSort"><i class="fas fa-sort-alpha-down"></i> Sort Code:</label>
+                    <select id="materialCodeSort" style="padding: 6px; font-size: 0.9em;"> <option value="NONE">Unsorted</option><option value="ASC">A-Z</option><option value="DESC">Z-A</option> </select>
+                </div>
+                <button id="toggleMoreFiltersBtn" style="background-color: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9em; display: flex; align-items: center; gap: 5px;">
+                    <i class="fas fa-sliders-h"></i> More
+                </button>
             </div>
-            <div id="movementFilterOptions" style="display: none; width: 100%; flex-wrap: wrap; justify-content: center; gap: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+
+            <div id="secondaryFilters" style="display: none; width: 100%; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 15px;">
                 <div class="filter-group">
-                    <label for="moveDateFrom"><i class="fas fa-calendar-alt"></i> From:</label>
-                    <input type="date" id="moveDateFrom">
-                    <input type="time" id="moveTimeFrom" value="06:00">
+                    <label for="itemTypeFilter"><i class="fas fa-box"></i> Item Type:</label>
+                    <select id="itemTypeFilter" style="padding: 6px; font-size: 0.9em;"> <option value="ALL">All</option><option value="LBL">Labels</option><option value="CTN">Carton</option><option value="PLASTIC">Plastic</option><option value="OTHERS">Other</option> </select>
                 </div>
                 <div class="filter-group">
-                    <label for="moveDateTo"><i class="fas fa-calendar-alt"></i> To:</label>
-                    <input type="date" id="moveDateTo">
-                    <input type="time" id="moveTimeTo" value="18:00">
+                    <label for="remarksFilter"><i class="fas fa-comment"></i> Remarks:</label>
+                    <select id="remarksFilter" style="padding: 6px; font-size: 0.9em;"> <option value="ALL">All</option><option value="HOLD">Hold</option><option value="APPROVED">Approved</option><option value="FIRSTOUT_OLD">First Out/Old</option><option value="NO_REMARK">No Remark</option><option value="OTHER_REMARKS">Other</option> </select>
                 </div>
-                <div class="filter-group">
-                    <label for="movementMode"><i class="fas fa-cog"></i> Mode:</label>
-                    <select id="movementMode">
-                        <option value="MARK_ONLY">Mark with ★ (Show All)</option>
-                        <option value="FILTER_ONLY">Show Moved Only</option>
-                    </select>
+                <div class="filter-group" style="width: 100%; justify-content: center;">
+                    <label style="cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; font-size: 0.9em;">
+                        <input type="checkbox" id="enableMovementFilter" style="width: 16px; height: 16px; cursor: pointer;">
+                        Mark items with movement (★)
+                    </label>
+                </div>
+
+                <div id="movementFilterOptions" style="display: none; width: 100%; flex-wrap: wrap; justify-content: center; gap: 15px; background: #f8f9fa; padding: 10px; border-radius: 6px; margin-top: 10px;">
+                    <div class="filter-group">
+                        <label for="moveDateFrom" style="font-size: 0.85em;"><i class="fas fa-calendar-alt"></i> From:</label>
+                        <input type="date" id="moveDateFrom" style="padding: 4px; font-size: 0.85em;">
+                        <input type="time" id="moveTimeFrom" value="06:00" style="padding: 4px; font-size: 0.85em;">
+                    </div>
+                    <div class="filter-group">
+                        <label for="moveDateTo" style="font-size: 0.85em;"><i class="fas fa-calendar-alt"></i> To:</label>
+                        <input type="date" id="moveDateTo" style="padding: 4px; font-size: 0.85em;">
+                        <input type="time" id="moveTimeTo" value="18:00" style="padding: 4px; font-size: 0.85em;">
+                    </div>
+                    <div class="filter-group">
+                        <label for="movementMode" style="font-size: 0.85em;"><i class="fas fa-cog"></i> Mode:</label>
+                        <select id="movementMode" style="padding: 4px; font-size: 0.85em;">
+                            <option value="MARK_ONLY">Mark with ★ (Show All)</option>
+                            <option value="FILTER_ONLY">Show Moved Only</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -454,6 +480,8 @@
 
         openBulkDeliveriesModalButton = document.getElementById('openBulkDeliveriesModalButton'),
         bulkDeliveriesModal = document.getElementById('bulkDeliveriesModal'),
+        toggleMoreFiltersBtn = document.getElementById('toggleMoreFiltersBtn'),
+        secondaryFilters = document.getElementById('secondaryFilters'),
         enableMovementFilter = document.getElementById('enableMovementFilter'),
         movementFilterOptions = document.getElementById('movementFilterOptions'),
         moveDateFrom = document.getElementById('moveDateFrom'),
@@ -1361,6 +1389,16 @@
         });
 
         [itemTypeFilter, remarksFilter, dataPresenceFilter, materialCodeSort, searchBar, moveDateFrom, moveTimeFrom, moveDateTo, moveTimeTo, movementMode].forEach(el => el.addEventListener('input', applyFiltersAndSort));
+
+        toggleMoreFiltersBtn.addEventListener('click', () => {
+            if (secondaryFilters.style.display === 'none') {
+                secondaryFilters.style.display = 'flex';
+                toggleMoreFiltersBtn.innerHTML = '<i class="fas fa-sliders-h"></i> Less';
+            } else {
+                secondaryFilters.style.display = 'none';
+                toggleMoreFiltersBtn.innerHTML = '<i class="fas fa-sliders-h"></i> More';
+            }
+        });
 
         enableMovementFilter.addEventListener('change', () => {
             if (enableMovementFilter.checked) {
