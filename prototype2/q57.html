@@ -8,27 +8,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; transition: background-color 0.3s ease, color 0.3s ease; }
-        .container { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); max-width: 900px; margin: auto; position: relative; }
+        .container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); max-width: 900px; margin: auto; position: relative; }
+        h1 { margin-top: 5px; margin-bottom: 15px; font-size: 1.8em; }
         h1, h2 { color: #0056b3; text-align: center; }
-        .info-bar { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px; padding: 20px; background-color: #fff; border-radius: 12px; margin-bottom: 24px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); }
+        .info-bar { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 15px; padding: 10px 15px; background-color: #fff; border-radius: 12px; margin-bottom: 15px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); }
         .info-item { display: flex; align-items: center; gap: 8px; }
-        .info-item label { font-weight: bold; color: #495057; }
-        .info-item input, .info-item select { padding: 5px 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 1em; }
-        .header-with-add-button { display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 20px; }
-        .header-with-add-button h2 { margin: 0; }
+        .info-item label { font-weight: bold; color: #495057; font-size: 0.95em; }
+        .info-item input, .info-item select { padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.95em; }
+        .header-with-add-button { display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 15px; }
+        .header-with-add-button h2 { margin: 0; font-size: 1.3em; }
         .header-button-group { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; gap: 10px; }
         .add-item-icon-btn { color: white; border: none; border-radius: 10px; width: 40px; height: 40px; font-size: 1.5em; cursor: pointer; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; transition: all 0.2s; }
         .add-item-icon-btn:hover { transform: scale(1.05); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .add-item-icon-btn i { font-size: 0.7em; }
-        #openAddItemModalButton { background-color: #28a745; }
         #fileOpsButton { background-color: #17a2b8; }
-        .main-buttons { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
-        .main-buttons button { background-color: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .main-buttons { display: flex; justify-content: center; gap: 12px; margin-bottom: 15px; flex-wrap: wrap; }
+        .main-buttons button { background-color: #007bff; color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95em; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
         .main-buttons button:hover { background-color: #0056b3; transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         .main-buttons button:active { transform: translateY(0); }
         .table-container { overflow-x: auto; width: 100%; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; border-radius: 8px; overflow: hidden; }
-        th, td { border: 1px solid #e5e7eb; padding: 12px 16px; text-align: left; vertical-align: top; white-space: nowrap; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; border-radius: 8px; overflow: hidden; }
+        th, td { border: 1px solid #e5e7eb; padding: 8px 12px; text-align: left; vertical-align: top; white-space: nowrap; }
         th { background-color: #f9fafb; color: #374151; font-weight: 600; text-transform: uppercase; font-size: 0.85em; letter-spacing: 0.05em; }
         tbody tr:nth-child(even) { background-color: #f9fafb; }
         tbody tr:hover { background-color: #f3f4f6; transition: background-color 0.2s ease; }
@@ -44,24 +44,25 @@
         .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; flex-wrap: wrap; }
         .modal-actions button { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: 600; color: white; transition: all 0.2s; }
         .modal-actions button:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        #confirmImportButton, #saveBreakdownButton, #confirmAddItemButton, #confirmWithdrawButton, #restoreButton, #confirmBulkClearButton, #confirmBulkWithdrawButton, #confirmBulkDeliveryButton, #confirmUnlockButton { background-color: #10b981; }
-        #cancelImportButton, #cancelBreakdownButton, #cancelAddItemButton, #deleteItemInModalButton, #cancelWithdrawButton, #cancelFileOps, #cancelClearChoice, #cancelBulkClear, #cancelBulkWithdraw, #cancelBulkDelivery, #cancelUnlockButton { background-color: #ef4444; }
+        #confirmImportButton, #saveBreakdownButton, #confirmWithdrawButton, #restoreButton, #confirmBulkClearButton, #confirmBulkWithdrawButton, #confirmBulkDeliveryButton, #confirmUnlockButton { background-color: #10b981; }
+        #cancelImportButton, #cancelBreakdownButton, #deleteItemInModalButton, #cancelWithdrawButton, #cancelFileOps, #cancelClearChoice, #cancelBulkClear, #cancelBulkWithdraw, #cancelBulkDelivery, #cancelUnlockButton { background-color: #ef4444; }
         #backupButton { background-color: #0ea5e9; }
         #exportExcelButton { background-color: #6b7280; }
         #triggerClearAllButton { background-color: #dc3545; }
+        #openImportModalButton { background-color: #f8f9fa; color: #333; }
         #triggerBulkClearButton { background-color: #f59e0b; color: #fff;}
         .editable-breakdown { cursor: pointer; text-decoration: underline; color: #0056b3; }
         .color-green { color: green; font-weight: bold; }
         .color-orange { color: orange; font-weight: bold; }
         .color-pink { color: #ff69b4; font-weight: bold; }
         .color-grey { color: grey; font-weight: normal; }
-        .filter-section { margin-top: 20px; margin-bottom: 24px; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; background-color: #fff; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); }
-        .filter-header { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; color: #0056b3; font-weight: 700; font-size: 1.1em; }
-        .filter-group { display: flex; align-items: center; gap: 10px; }
+        .filter-section { margin-top: 15px; margin-bottom: 15px; border: 1px solid #e5e7eb; border-radius: 12px; padding: 15px; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; background-color: #fff; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); }
+        .filter-header { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; color: #0056b3; font-weight: 700; font-size: 1em; }
+        .filter-group { display: flex; align-items: center; gap: 8px; }
         .filter-group label { font-weight: bold; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
-        .filter-group label i { font-size: 1.2em; color: #0056b3; }
-        .filter-section select, .filter-section input[type="text"] { padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; min-width: 120px; }
-        hr { border: 0; height: 1px; background: #ccc; margin: 20px 0; }
+        .filter-group label i { font-size: 1.1em; color: #0056b3; }
+        .filter-section select, .filter-section input[type="text"] { padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9em; min-width: 120px; }
+        hr { border: 0; height: 1px; background: #ccc; margin: 15px 0; }
         #historyTable th:nth-child(1), #historyTable td:nth-child(1) { white-space: nowrap; width: 160px; }
         #historyTable td:nth-child(4) { white-space: normal; }
         #clearHistoryButton {
@@ -133,11 +134,22 @@
         body.dark-mode .print-options-container p { color: #60a5fa !important; }
         body.dark-mode .print-options-container small { color: #9ca3af !important; }
         body.dark-mode .print-options-container label { color: #d1d5db; }
+        body.dark-mode .modal-content p { color: #d1d5db; }
+
+        body.dark-mode .modal-actions button { color: #fff; }
+        body.dark-mode #cancelFileOps { background-color: #dc3545; color: white; }
+        body.dark-mode #openImportModalButton { background-color: #f8f9fa; color: #333; }
+        body.dark-mode #backupButton { background-color: #0ea5e9; color: white; }
+        body.dark-mode #restoreButton { background-color: #10b981; color: white; }
+        body.dark-mode #exportExcelButton { background-color: #6b7280; color: white; }
+        body.dark-mode #printInventoryButton { background-color: #f59e0b; color: white; }
+        body.dark-mode #clearInventoryButton { background-color: #ef4444; color: white; }
 
         body.dark-mode .bulk-del-item { background-color: #374151 !important; border-color: #4b5563 !important; }
         body.dark-mode .bulk-del-item input { background-color: #1f2937; color: #fff; border-color: #4b5563; }
         body.dark-mode .bulk-del-item input::placeholder { color: #9ca3af; }
         body.dark-mode #movementFilterOptions { background-color: #2d3748 !important; color: #fff; }
+        body.dark-mode #secondaryFilters { border-top-color: #4b5563 !important; }
 
         .highlight { background-color: #ffeb3b; color: #000; padding: 0 2px; border-radius: 2px; font-weight: bold; }
         body.dark-mode .highlight { background-color: #f59e0b; color: #000; }
@@ -154,56 +166,73 @@
             <div class="info-item"> <label for="currentShift">Shift:</label> <select id="currentShift"> <option>Day Shift</option> <option>Night Shift</option> </select> </div>
         </div>
         <hr>
-        <div class="header-with-add-button">
-            <h2>Manage Inventory</h2>
-            <div class="header-button-group">
-                <button id="lockSystemButton" class="add-item-icon-btn" title="System Locked" style="background-color: #dc3545; margin-right: 2px;"><i class="fas fa-lock"></i></button>
-                <button id="darkModeToggle" class="add-item-icon-btn" title="Toggle Dark Mode" style="background-color: #6c757d; margin-right: 2px;"><i class="fas fa-moon"></i></button>
-                <button id="fileOpsButton" class="add-item-icon-btn" title="File Operations"><i class="fas fa-folder-open"></i></button>
-                <button id="openAddItemModalButton" class="add-item-icon-btn" title="Add New Item">+</button>
-            </div>
+        <div class="floating-action-buttons" style="position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 1000;">
+            <button id="lockSystemButton" class="add-item-icon-btn" title="System Locked" style="background-color: #dc3545;"><i class="fas fa-lock"></i></button>
+            <button id="darkModeToggle" class="add-item-icon-btn" title="Toggle Dark Mode" style="background-color: #6c757d;"><i class="fas fa-moon"></i></button>
+            <button id="fileOpsButton" class="add-item-icon-btn" title="File Operations"><i class="fas fa-folder-open"></i></button>
         </div>
         <div id="errorMessage" class="error-message"></div>
-        <hr>
-        <h2>Data Operations</h2>
-        <div class="main-buttons">
-            <button id="openImportModalButton"><i class="fas fa-file-import"></i> Import Data</button>
+        <div class="main-buttons" style="justify-content: center;">
             <button id="openBulkDeliveriesModalButton" style="background-color: #6f42c1;"><i class="fas fa-shipping-fast"></i> Bulk Deliveries</button>
             <button id="openBulkWithdrawModalButton" style="background-color: #fd7e14;"><i class="fas fa-dolly-flatbed"></i> Bulk Withdraw</button>
             <button id="openVarianceModalButton" style="background-color: #6610f2;"><i class="fas fa-balance-scale"></i> Variance Tracker</button>
-            <button id="clearInventoryButton" style="background-color: #dc3545;"><i class="fas fa-trash-alt"></i> Clear Data</button>
         </div>
         <hr>
         <div class="filter-section">
-            <div class="filter-header"><i class="fas fa-filter"></i> Filter & <i class="fas fa-sort-alpha-down"></i> Sort Inventory</div>
-            <div class="filter-group"> <label for="searchBar"><i class="fas fa-search"></i> Search:</label> <input type="text" id="searchBar" placeholder="Type to search..."> </div>
-            <div class="filter-group"> <label for="itemTypeFilter"><i class="fas fa-box"></i> Item Type:</label> <select id="itemTypeFilter"> <option value="ALL">All</option><option value="LBL">Labels</option><option value="CTN">Carton</option><option value="PLASTIC">Plastic</option><option value="OTHERS">Other</option> </select> </div>
-            <div class="filter-group"> <label for="remarksFilter"><i class="fas fa-comment"></i> Remarks:</label> <select id="remarksFilter"> <option value="ALL">All</option><option value="HOLD">Hold</option><option value="APPROVED">Approved</option><option value="FIRSTOUT_OLD">First Out/Old</option><option value="NO_REMARK">No Remark</option><option value="OTHER_REMARKS">Other</option> </select> </div>
-            <div class="filter-group"> <label for="dataPresenceFilter"><i class="fas fa-database"></i> Qty Data:</label> <select id="dataPresenceFilter"> <option value="ALL">All</option><option value="WITH_DATA">With Data</option><option value="WITHOUT_DATA">No Data</option> </select> </div>
-            <div class="filter-group"> <label for="materialCodeSort"><i class="fas fa-sort-alpha-down"></i> Sort Code:</label> <select id="materialCodeSort"> <option value="NONE">Unsorted</option><option value="ASC">A-Z</option><option value="DESC">Z-A</option> </select> </div>
-            <div class="filter-group" style="width: 100%; justify-content: center; border-top: 1px solid #eee; padding-top: 15px; margin-top: 10px;">
-                <label style="cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px;">
-                    <input type="checkbox" id="enableMovementFilter" style="width: 18px; height: 18px; cursor: pointer;">
-                    Mark items with movement (★)
-                </label>
+            <div class="filter-header" style="margin-bottom: 10px;"><i class="fas fa-filter"></i> Filter & <i class="fas fa-sort-alpha-down"></i> Sort Inventory</div>
+
+            <div class="primary-filters" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: center; width: 100%;">
+                <div class="filter-group" style="flex: 1; min-width: 250px;">
+                    <label for="searchBar"><i class="fas fa-search"></i> Search:</label>
+                    <input type="text" id="searchBar" placeholder="Type to search..." style="padding: 6px; font-size: 0.9em;">
+                </div>
+                <div class="filter-group">
+                    <label for="dataPresenceFilter"><i class="fas fa-database"></i> Qty Data:</label>
+                    <select id="dataPresenceFilter" style="padding: 6px; font-size: 0.9em;"> <option value="ALL">All</option><option value="WITH_DATA" selected>With Data</option><option value="WITHOUT_DATA">No Data</option> </select>
+                </div>
+                <div class="filter-group">
+                    <label for="materialCodeSort"><i class="fas fa-sort-alpha-down"></i> Sort Code:</label>
+                    <select id="materialCodeSort" style="padding: 6px; font-size: 0.9em;"> <option value="NONE">Unsorted</option><option value="ASC" selected>A-Z</option><option value="DESC">Z-A</option> </select>
+                </div>
+                <button id="toggleMoreFiltersBtn" style="background-color: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9em; display: flex; align-items: center; gap: 5px;">
+                    <i class="fas fa-sliders-h"></i> More
+                </button>
             </div>
-            <div id="movementFilterOptions" style="display: none; width: 100%; flex-wrap: wrap; justify-content: center; gap: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+
+            <div id="secondaryFilters" style="display: none; width: 100%; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 15px;">
                 <div class="filter-group">
-                    <label for="moveDateFrom"><i class="fas fa-calendar-alt"></i> From:</label>
-                    <input type="date" id="moveDateFrom">
-                    <input type="time" id="moveTimeFrom" value="06:00">
+                    <label for="itemTypeFilter"><i class="fas fa-box"></i> Item Type:</label>
+                    <select id="itemTypeFilter" style="padding: 6px; font-size: 0.9em;"> <option value="ALL">All</option><option value="LBL">Labels</option><option value="CTN">Carton</option><option value="PLASTIC">Plastic</option><option value="OTHERS">Other</option> </select>
                 </div>
                 <div class="filter-group">
-                    <label for="moveDateTo"><i class="fas fa-calendar-alt"></i> To:</label>
-                    <input type="date" id="moveDateTo">
-                    <input type="time" id="moveTimeTo" value="18:00">
+                    <label for="remarksFilter"><i class="fas fa-comment"></i> Remarks:</label>
+                    <select id="remarksFilter" style="padding: 6px; font-size: 0.9em;"> <option value="ALL">All</option><option value="HOLD">Hold</option><option value="APPROVED">Approved</option><option value="FIRSTOUT_OLD">First Out/Old</option><option value="NO_REMARK">No Remark</option><option value="OTHER_REMARKS">Other</option> </select>
                 </div>
-                <div class="filter-group">
-                    <label for="movementMode"><i class="fas fa-cog"></i> Mode:</label>
-                    <select id="movementMode">
-                        <option value="MARK_ONLY">Mark with ★ (Show All)</option>
-                        <option value="FILTER_ONLY">Show Moved Only</option>
-                    </select>
+                <div class="filter-group" style="width: 100%; justify-content: center;">
+                    <label style="cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; font-size: 0.9em;">
+                        <input type="checkbox" id="enableMovementFilter" style="width: 16px; height: 16px; cursor: pointer;">
+                        Mark items with movement (★)
+                    </label>
+                </div>
+
+                <div id="movementFilterOptions" style="display: none; width: 100%; flex-wrap: wrap; justify-content: center; gap: 15px; background: #f8f9fa; padding: 10px; border-radius: 6px; margin-top: 10px;">
+                    <div class="filter-group">
+                        <label for="moveDateFrom" style="font-size: 0.85em;"><i class="fas fa-calendar-alt"></i> From:</label>
+                        <input type="date" id="moveDateFrom" style="padding: 4px; font-size: 0.85em;">
+                        <input type="time" id="moveTimeFrom" value="06:00" style="padding: 4px; font-size: 0.85em;">
+                    </div>
+                    <div class="filter-group">
+                        <label for="moveDateTo" style="font-size: 0.85em;"><i class="fas fa-calendar-alt"></i> To:</label>
+                        <input type="date" id="moveDateTo" style="padding: 4px; font-size: 0.85em;">
+                        <input type="time" id="moveTimeTo" value="18:00" style="padding: 4px; font-size: 0.85em;">
+                    </div>
+                    <div class="filter-group">
+                        <label for="movementMode" style="font-size: 0.85em;"><i class="fas fa-cog"></i> Mode:</label>
+                        <select id="movementMode" style="padding: 4px; font-size: 0.85em;">
+                            <option value="MARK_ONLY">Mark with ★ (Show All)</option>
+                            <option value="FILTER_ONLY">Show Moved Only</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -211,10 +240,10 @@
     <div id="varianceModal" class="modal">
         <div class="modal-content" style="max-width: 800px;">
             <h2><i class="fas fa-balance-scale"></i> Inventory Variance Tracker</h2>
-            <p>Upload the <strong>FIFO Excel File</strong> to compare against the system inventory.</p>
+            <p>Upload a <strong>System Backup Excel File (Old)</strong> to compare against the current system inventory.</p>
 
             <div class="item-input">
-                <label for="varianceFileInput">Select Excel File:</label>
+                <label for="varianceFileInput">Select Backup File:</label>
                 <input type="file" id="varianceFileInput" accept=".xlsx, .xls">
             </div>
 
@@ -226,7 +255,7 @@
                         <tr>
                             <th>Material Code</th>
                             <th>System Qty</th>
-                            <th>Excel Qty (FIFO)</th>
+                            <th>Backup Qty (Old)</th>
                             <th>Variance</th>
                         </tr>
                     </thead>
@@ -283,7 +312,6 @@
     </div>
     <div id="importDataModal" class="modal"> <div class="modal-content"> <h2>Import Data from Excel</h2> <div class="item-input"> <label for="excelSheetSelect">Select Sheet:</label> <select id="excelSheetSelect"></select> </div> <div class="item-input"> <label for="stockingQtyDateSelectModal">Select Stocking Qty Column (Optional):</label> <select id="stockingQtyDateSelectModal"></select> </div> <div id="importErrorMessageDiv" class="error-message"></div> <div class="modal-actions"> <button id="confirmImportButton">Import</button> <button id="cancelImportButton">Cancel</button> </div> </div> </div>
     <div id="editBreakdownModal" class="modal"> <div class="modal-content"> <h2>Edit Item Details</h2> <div class="item-input"> <label for="editBreakdownInput">Stocking Qty:</label> <input type="text" id="editBreakdownInput"> </div> <div id="dynamicRemarksContainer"></div> <div class="modal-actions"> <button id="saveBreakdownButton">Save</button> <button id="cancelBreakdownButton">Cancel</button> <button id="deleteItemInModalButton">Delete Item</button> </div> </div> </div>
-    <div id="addItemModal" class="modal"> <div class="modal-content"> <h2>Add New Inventory Item</h2> <div class="item-input"> <label for="addItemCodeInput">MATERIAL CODE:</label> <input type="text" id="addItemCodeInput" placeholder="e.g., BAG-A19.5X35PE" required> </div> <div class="item-input"> <label for="addItemBreakdownInput">Stocking Qty:</label> <input type="text" id="addItemBreakdownInput" placeholder="e.g., 244,800 | 100x2 (optional)"> </div> <div id="addItemErrorMessage" class="error-message"></div> <div class="modal-actions"> <button id="confirmAddItemButton">Add Item</button> <button id="cancelAddItemButton">Cancel</button> </div> </div> </div>
         <div id="fileOpsModal" class="modal">
         <div class="modal-content">
             <h2>File Operations</h2>
@@ -314,11 +342,13 @@
                 </div>
                 <small style="color: #6b7280; text-align: center;">Items with transactions between these dates will be marked.</small>
             </div>
-            <div class="modal-actions" style="justify-content: center;">
+            <div class="modal-actions" style="justify-content: center; flex-wrap: wrap; gap: 10px;">
+                <button id="openImportModalButton"><i class="fas fa-file-import"></i> Import Data</button>
                 <button id="backupButton"><i class="fas fa-download"></i> Backup</button>
                 <button id="restoreButton"><i class="fas fa-upload"></i> Restore</button>
                 <button id="exportExcelButton"><i class="fas fa-file-excel"></i> Export Report</button>
                 <button id="printInventoryButton" style="background-color: #f39c12;"><i class="fas fa-print"></i> Print</button>
+                <button id="clearInventoryButton" style="background-color: #dc3545;"><i class="fas fa-trash-alt"></i> Clear Data</button>
             </div>
             <div class="modal-actions">
                 <button id="cancelFileOps">Cancel</button>
@@ -403,7 +433,6 @@
         materialCodeSort = document.getElementById('materialCodeSort'),
         searchBar = document.getElementById('searchBar'),
         openImportModalButton = document.getElementById('openImportModalButton'),
-        openAddItemModalButton = document.getElementById('openAddItemModalButton'),
         historyTableBody = document.getElementById('historyTableBody'),
         clearHistoryButton = document.getElementById('clearHistoryButton'),
         fileOpsButton = document.getElementById('fileOpsButton'),
@@ -419,12 +448,6 @@
         saveBreakdownButton = document.getElementById('saveBreakdownButton'),
         cancelBreakdownButton = document.getElementById('cancelBreakdownButton'),
         deleteItemInModalButton = document.getElementById('deleteItemInModalButton'),
-        addItemModal = document.getElementById('addItemModal'),
-        addItemCodeInput = document.getElementById('addItemCodeInput'),
-        addItemBreakdownInput = document.getElementById('addItemBreakdownInput'),
-        confirmAddItemButton = document.getElementById('confirmAddItemButton'),
-        cancelAddItemButton = document.getElementById('cancelAddItemButton'),
-        addItemErrorMessage = document.getElementById('addItemErrorMessage'),
         fileOpsModal = document.getElementById('fileOpsModal'),
         backupButton = document.getElementById('backupButton'),
         restoreButton = document.getElementById('restoreButton'),
@@ -458,6 +481,8 @@
 
         openBulkDeliveriesModalButton = document.getElementById('openBulkDeliveriesModalButton'),
         bulkDeliveriesModal = document.getElementById('bulkDeliveriesModal'),
+        toggleMoreFiltersBtn = document.getElementById('toggleMoreFiltersBtn'),
+        secondaryFilters = document.getElementById('secondaryFilters'),
         enableMovementFilter = document.getElementById('enableMovementFilter'),
         movementFilterOptions = document.getElementById('movementFilterOptions'),
         moveDateFrom = document.getElementById('moveDateFrom'),
@@ -867,12 +892,14 @@
             });
 
             const printWindow = window.open('', '_blank');
+            const totalCols = showMarking ? 4 : 3;
             printWindow.document.write(`
                 <html>
                 <head>
                     <title>Print Inventory</title>
                     <style>
                         body { font-family: Arial, sans-serif; margin: 10px 20px; color: #000; }
+                        .header-row td { border: none !important; padding: 0 !important; background-color: transparent !important; }
                         .header { text-align: center; font-weight: bold; font-size: 1.1em; margin-bottom: 2px; }
                         .info-line { display: flex; justify-content: space-between; font-weight: bold; border-top: 2px solid black; border-bottom: 2px solid black; padding: 2px 0; margin-bottom: 5px; font-size: 0.95em; }
                         .section-title { color: red; text-decoration: underline; font-weight: bold; margin-top: 5px; margin-bottom: 5px; font-size: 1.05em; }
@@ -887,18 +914,23 @@
                         @media print {
                             @page { margin: 0.5cm; }
                             body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                            thead { display: table-header-group; }
                         }
                     </style>
                 </head>
                 <body>
-                    <div class="header">PACKAGING MATERIALS DAILY COUNT SHEET - COHIN (BLDG. 1&2)</div>
-                    <div class="info-line">
-                        <span>Date / Shift : ${formattedDate} ${shiftAbbr}</span>
-                        <span>TIME COUNTED: ${formattedTime}</span>
-                    </div>
-                    <div class="section-title">LABELS & PLASTIC</div>
                     <table>
                         <thead>
+                            <tr class="header-row">
+                                <td colspan="${totalCols}">
+                                    <div class="header">PACKAGING MATERIALS DAILY COUNT SHEET - COHIN (BLDG. 1&2)</div>
+                                    <div class="info-line">
+                                        <span>Date / Shift : ${formattedDate} ${shiftAbbr}</span>
+                                        <span>TIME COUNTED: ${formattedTime}</span>
+                                    </div>
+                                    <div class="section-title">LABELS & PLASTIC</div>
+                                </td>
+                            </tr>
                             <tr>
                                 <th style="text-align: center; width: 30px;">NO.</th>
                                 ${showMarking ? '<th style="text-align: center; width: 30px;">M</th>' : ''}
@@ -1359,6 +1391,16 @@
 
         [itemTypeFilter, remarksFilter, dataPresenceFilter, materialCodeSort, searchBar, moveDateFrom, moveTimeFrom, moveDateTo, moveTimeTo, movementMode].forEach(el => el.addEventListener('input', applyFiltersAndSort));
 
+        toggleMoreFiltersBtn.addEventListener('click', () => {
+            if (secondaryFilters.style.display === 'none') {
+                secondaryFilters.style.display = 'flex';
+                toggleMoreFiltersBtn.innerHTML = '<i class="fas fa-sliders-h"></i> Less';
+            } else {
+                secondaryFilters.style.display = 'none';
+                toggleMoreFiltersBtn.innerHTML = '<i class="fas fa-sliders-h"></i> More';
+            }
+        });
+
         enableMovementFilter.addEventListener('change', () => {
             if (enableMovementFilter.checked) {
                 movementFilterOptions.style.display = 'flex';
@@ -1385,10 +1427,9 @@
         });
 
         fileOpsButton.addEventListener('click', () => { checkAccess(() => { fileOpsModal.style.display = 'block'; }); });
-        openAddItemModalButton.addEventListener('click', () => { checkAccess(() => { addItemModal.style.display = 'block'; addItemCodeInput.value = ''; addItemBreakdownInput.value = ''; addItemErrorMessage.textContent = ''; addItemCodeInput.focus(); }); });
-        openImportModalButton.addEventListener('click', () => { checkAccess(() => { const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = ".xlsx, .xls"; fileInput.onchange = e => handleFileSelect(e.target.files[0]); fileInput.click(); }); });
+        openImportModalButton.addEventListener('click', () => { checkAccess(() => { fileOpsModal.style.display = 'none'; const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = ".xlsx, .xls"; fileInput.onchange = e => handleFileSelect(e.target.files[0]); fileInput.click(); }); });
 
-        clearInventoryButton.addEventListener('click', () => { checkAccess(() => { clearChoiceModal.style.display = 'block'; }); });
+        clearInventoryButton.addEventListener('click', () => { checkAccess(() => { fileOpsModal.style.display = 'none'; clearChoiceModal.style.display = 'block'; }); });
         clearHistoryButton.addEventListener('click', () => { checkAccess(() => { if (confirm('Are you sure?')) { transactionHistory = []; historyTableBody.innerHTML = ''; localStorage.removeItem('transactionHistory'); logTransaction('CLEAR HISTORY', '-', 'Transaction history cleared.'); } }); });
         inventoryTableBody.addEventListener('click', (event) => { const targetCell = event.target.closest('.editable-breakdown'); if (targetCell) {
             checkAccess(() => {
@@ -1410,7 +1451,6 @@
         cancelBulkClear.addEventListener('click', () => { bulkClearQtyModal.style.display = 'none'; });
         confirmBulkClearButton.addEventListener('click', () => { const selectedCheckboxes = Array.from(bulkClearList.querySelectorAll('input[type="checkbox"]:checked')); if (selectedCheckboxes.length === 0) { alert('Please select at least one item to clear.'); return; } const codesToClear = selectedCheckboxes.map(cb => cb.value); if (confirm(`Are you sure you want to clear the quantity for ${codesToClear.length} selected item(s)?`)) { codesToClear.forEach(code => { const targetRow = originalRowsOrder.find(row => row.dataset.code === code); if (targetRow) { targetRow.dataset.stockingQty = ''; targetRow.dataset.remarks = '[]'; targetRow.cells[1].innerHTML = ''; targetRow.cells[2].textContent = '0'; targetRow.cells[3].textContent = ''; } }); saveInventoryToLocalStorage(); logTransaction('BULK CLEAR QTY', `${codesToClear.length} items`, codesToClear.slice(0, 5).join(', ') + (codesToClear.length > 5 ? '...' : '')); applyFiltersAndSort(); alert(`Successfully cleared quantities for ${codesToClear.length} item(s).`); bulkClearQtyModal.style.display = 'none'; } });
         confirmImportButton.addEventListener('click', () => { if (!confirm("Importing new data will overwrite the current inventory. Do you want to continue?")) { return; } const sheetName = excelSheetSelect.value; const worksheet = loadedWorkbook.Sheets[sheetName]; const qtyColIndex = stockingQtyDateSelectModal.value; const dataForHeaders = XLSX.utils.sheet_to_json(worksheet, { header: 1 }); const codeHeaderRow = dataForHeaders[4] || []; const codeColIndex = codeHeaderRow.findIndex(h => typeof h === 'string' && h.trim().toUpperCase() === 'MATERIAL CODE'); if (codeColIndex === -1) { importErrorMessageDiv.textContent = `"MATERIAL CODE" column not found on Row 5.`; return; } inventoryTableBody.innerHTML = ''; originalRowsOrder = []; const range = XLSX.utils.decode_range(worksheet['!ref']); let importedCount = 0; for (let R = DATA_START_ROW_EXCEL_INDEX - 1; R <= range.e.r; ++R) { const codeCell = worksheet[XLSX.utils.encode_cell({c: codeColIndex, r: R})]; if (codeCell && codeCell.v) { importedCount++; const code = codeCell.w || codeCell.v.toString(); let stockingQty = ''; if (qtyColIndex) { const qtyCell = worksheet[XLSX.utils.encode_cell({c: parseInt(qtyColIndex), r: R})]; if (qtyCell) stockingQty = qtyCell.f || qtyCell.w || String(qtyCell.v) || ''; } renderRow({ code: code.trim(), stockingQty: stockingQty.toString(), remarks: Array(getBreakdownParts(formatStockingQty(stockingQty)).length).fill('') }, false); } } applyFiltersAndSort(); saveInventoryToLocalStorage(); logTransaction('IMPORT', '-', `Imported ${importedCount} items from sheet: ${sheetName}.`); importDataModal.style.display = 'none'; });
-        confirmAddItemButton.addEventListener('click', () => { const code = addItemCodeInput.value.trim(); if (!code) { addItemErrorMessage.textContent = 'MATERIAL CODE is required.'; return; } if (originalRowsOrder.some(row => row.dataset.code === code)) { addItemErrorMessage.textContent = 'This Material Code already exists.'; return; } const breakdown = addItemBreakdownInput.value.trim(); const newItem = { code: code, stockingQty: breakdown, remarks: Array(getBreakdownParts(formatStockingQty(breakdown)).length).fill('') }; renderRow(newItem); applyFiltersAndSort(); logTransaction('ADD ITEM', code, `Added with Qty: ${breakdown || '0'}`); addItemModal.style.display = 'none'; });
         editBreakdownInput.addEventListener('input', function() { const parts = getBreakdownParts(formatStockingQty(this.value)); const currentRemarks = Array.from(dynamicRemarksContainer.querySelectorAll('input')).map(input => input.value); generateRemarksInputs(parts.length, currentRemarks); });
         saveBreakdownButton.addEventListener('click', () => { if (!currentEditingRow) return; const oldStockingQty = currentEditingRow.dataset.stockingQty; const newStockingQty = editBreakdownInput.value; const newRemarks = Array.from(dynamicRemarksContainer.querySelectorAll('input')).map(input => input.value.trim()); currentEditingRow.dataset.stockingQty = newStockingQty; currentEditingRow.dataset.remarks = JSON.stringify(newRemarks); const formattedBreakdown = formatStockingQty(newStockingQty); const total = calculateSingleStockingQtyTotal(formattedBreakdown); currentEditingRow.cells[1].innerHTML = formatStockingQtyAndRemarksForDisplay(formattedBreakdown, newRemarks); currentEditingRow.cells[2].textContent = total.toLocaleString(); currentEditingRow.cells[3].textContent = newRemarks.filter(r => r).join(' | '); saveInventoryToLocalStorage(); logTransaction('EDIT ITEM', currentEditingRow.dataset.code, `Qty: "${oldStockingQty}" -> "${newStockingQty}"`); editBreakdownModal.style.display = 'none'; });
         deleteItemInModalButton.addEventListener('click', () => { if (!currentEditingRow) return; const codeToDelete = currentEditingRow.dataset.code; if (confirm(`Are you sure you want to delete ${codeToDelete}?`)) { const index = originalRowsOrder.findIndex(row => row === currentEditingRow); if (index > -1) originalRowsOrder.splice(index, 1); applyFiltersAndSort(); saveInventoryToLocalStorage(); logTransaction('DELETE ITEM', codeToDelete, 'Item and its stock removed.'); editBreakdownModal.style.display = 'none'; } });
@@ -1514,6 +1554,15 @@
             }
         });
 
+        bulkWithdrawList.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && event.target.tagName === 'INPUT' && event.target.type === 'text') {
+                event.preventDefault(); // Prevent form submission if any
+                bulkWithdrawSearch.value = ''; // Clear search box
+                populateBulkWithdrawList(); // Refresh list to show all items
+                bulkWithdrawSearch.focus(); // Move cursor to search box
+            }
+        });
+
         cancelBulkWithdraw.addEventListener('click', () => {
             bulkWithdrawModal.style.display = 'none';
         });
@@ -1564,7 +1613,6 @@
         });
 
         cancelImportButton.addEventListener('click', () => { importDataModal.style.display = 'none' });
-        cancelAddItemButton.addEventListener('click', () => { addItemModal.style.display = 'none' });
         cancelBreakdownButton.addEventListener('click', () => { editBreakdownModal.style.display = 'none' });
         cancelBulkDelivery.addEventListener('click', () => { bulkDeliveriesModal.style.display = 'none' });
 
@@ -1595,37 +1643,29 @@
             reader.onload = (e) => {
                 try {
                     const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-                    // Assuming data is in the first sheet
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    // Restore Inventory logic (parse backup format)
+                    const invSheet = workbook.Sheets["Inventory_Backup"] || workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(invSheet);
 
                     // Parse Data
                     const excelInventory = {};
-                    let currentItemCode = null;
 
-                    // Iterate through rows (start from index 0)
-                    for (let i = 0; i < jsonData.length; i++) {
-                        const row = jsonData[i];
-                        // Column A is index 0
-                        if (row[0]) {
-                            const val = String(row[0]).trim();
-                            if (val && val !== 'ITEMS & RR#' && val !== 'First IN First OUT') {
-                                currentItemCode = val;
-                            }
-                        }
-
-                        // Column C (index 2) for "TOTAL"
-                        if (row[2] && String(row[2]).toUpperCase().includes('TOTAL')) {
-                            if (currentItemCode) {
-                                // Column E (index 4) for Stocks
-                                const stockVal = parseFloat(row[4]);
-                                if (!isNaN(stockVal)) {
-                                    excelInventory[currentItemCode] = stockVal;
-                                }
-                            }
-                        }
+                    if (!jsonData.length || !jsonData[0].hasOwnProperty('MATERIAL_CODE') || !jsonData[0].hasOwnProperty('STOCKING_QTY')) {
+                        varianceErrorMessage.textContent = 'Invalid Backup file format. Ensure you are uploading a system backup.';
+                        return;
                     }
+
+                    jsonData.forEach(item => {
+                        if (item.MATERIAL_CODE) {
+                            const code = String(item.MATERIAL_CODE).trim();
+                            const stockingQtyString = String(item.STOCKING_QTY || '');
+                            const stockVal = calculateSingleStockingQtyTotal(formatStockingQty(stockingQtyString));
+
+                            if (!isNaN(stockVal)) {
+                                excelInventory[code] = stockVal;
+                            }
+                        }
+                    });
 
                     // Compare with System Data
                     const varianceResults = [];
