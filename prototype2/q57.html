@@ -1554,6 +1554,15 @@
             }
         });
 
+        bulkWithdrawList.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && event.target.tagName === 'INPUT' && event.target.type === 'text') {
+                event.preventDefault(); // Prevent form submission if any
+                bulkWithdrawSearch.value = ''; // Clear search box
+                populateBulkWithdrawList(); // Refresh list to show all items
+                bulkWithdrawSearch.focus(); // Move cursor to search box
+            }
+        });
+
         cancelBulkWithdraw.addEventListener('click', () => {
             bulkWithdrawModal.style.display = 'none';
         });
