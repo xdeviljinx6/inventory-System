@@ -240,10 +240,10 @@
     <div id="varianceModal" class="modal">
         <div class="modal-content" style="max-width: 800px;">
             <h2><i class="fas fa-balance-scale"></i> Inventory Variance Tracker</h2>
-            <p>Upload the <strong>FIFO Excel File</strong> to compare against the system inventory.</p>
+            <p>Upload a <strong>System Backup Excel File (Old)</strong> to compare against the current system inventory.</p>
 
             <div class="item-input">
-                <label for="varianceFileInput">Select Excel File:</label>
+                <label for="varianceFileInput">Select Backup File:</label>
                 <input type="file" id="varianceFileInput" accept=".xlsx, .xls">
             </div>
 
@@ -255,7 +255,7 @@
                         <tr>
                             <th>Material Code</th>
                             <th>System Qty</th>
-                            <th>Excel Qty (FIFO)</th>
+                            <th>Backup Qty (Old)</th>
                             <th>Variance</th>
                         </tr>
                     </thead>
@@ -1643,37 +1643,29 @@
             reader.onload = (e) => {
                 try {
                     const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-                    // Assuming data is in the first sheet
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    // Restore Inventory logic (parse backup format)
+                    const invSheet = workbook.Sheets["Inventory_Backup"] || workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(invSheet);
 
                     // Parse Data
                     const excelInventory = {};
-                    let currentItemCode = null;
 
-                    // Iterate through rows (start from index 0)
-                    for (let i = 0; i < jsonData.length; i++) {
-                        const row = jsonData[i];
-                        // Column A is index 0
-                        if (row[0]) {
-                            const val = String(row[0]).trim();
-                            if (val && val !== 'ITEMS & RR#' && val !== 'First IN First OUT') {
-                                currentItemCode = val;
-                            }
-                        }
-
-                        // Column C (index 2) for "TOTAL"
-                        if (row[2] && String(row[2]).toUpperCase().includes('TOTAL')) {
-                            if (currentItemCode) {
-                                // Column E (index 4) for Stocks
-                                const stockVal = parseFloat(row[4]);
-                                if (!isNaN(stockVal)) {
-                                    excelInventory[currentItemCode] = stockVal;
-                                }
-                            }
-                        }
+                    if (!jsonData.length || !jsonData[0].hasOwnProperty('MATERIAL_CODE') || !jsonData[0].hasOwnProperty('STOCKING_QTY')) {
+                        varianceErrorMessage.textContent = 'Invalid Backup file format. Ensure you are uploading a system backup.';
+                        return;
                     }
+
+                    jsonData.forEach(item => {
+                        if (item.MATERIAL_CODE) {
+                            const code = String(item.MATERIAL_CODE).trim();
+                            const stockingQtyString = String(item.STOCKING_QTY || '');
+                            const stockVal = calculateSingleStockingQtyTotal(formatStockingQty(stockingQtyString));
+
+                            if (!isNaN(stockVal)) {
+                                excelInventory[code] = stockVal;
+                            }
+                        }
+                    });
 
                     // Compare with System Data
                     const varianceResults = [];
