@@ -1577,11 +1577,22 @@
                 bulkWithdrawSearch.value = '';
                 populateBulkWithdrawList();
                 bulkWithdrawModal.style.display = 'block';
+                setTimeout(() => bulkWithdrawSearch.focus(), 100);
             });
         });
 
         bulkWithdrawSearch.addEventListener('input', () => {
             populateBulkWithdrawList(bulkWithdrawSearch.value.toLowerCase());
+        });
+
+        bulkWithdrawSearch.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                const firstInput = bulkWithdrawList.querySelector('input[type="text"]');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            }
         });
 
         bulkWithdrawList.addEventListener('input', (event) => {
@@ -1605,11 +1616,32 @@
         });
 
         bulkWithdrawList.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' && event.target.tagName === 'INPUT' && event.target.type === 'text') {
-                event.preventDefault(); // Prevent form submission if any
-                bulkWithdrawSearch.value = ''; // Clear search box
-                populateBulkWithdrawList(); // Refresh list to show all items
-                bulkWithdrawSearch.focus(); // Move cursor to search box
+            if (event.target.tagName === 'INPUT' && event.target.type === 'text') {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Prevent form submission if any
+                    bulkWithdrawSearch.value = ''; // Clear search box
+                    populateBulkWithdrawList(); // Refresh list to show all items
+                    bulkWithdrawSearch.focus(); // Move cursor to search box
+                } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    const inputs = Array.from(bulkWithdrawList.querySelectorAll('input[type="text"]'));
+                    const currentIndex = inputs.indexOf(event.target);
+
+                    if (event.key === 'ArrowDown') {
+                        const nextInput = inputs[currentIndex + 1];
+                        if (nextInput) {
+                            nextInput.focus();
+                        }
+                    } else if (event.key === 'ArrowUp') {
+                        const prevInput = inputs[currentIndex - 1];
+                        if (prevInput) {
+                            prevInput.focus();
+                        } else {
+                            // If at the top, go back to search
+                            bulkWithdrawSearch.focus();
+                        }
+                    }
+                }
             }
         });
 
