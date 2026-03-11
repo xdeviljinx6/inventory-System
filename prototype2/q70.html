@@ -1338,6 +1338,11 @@
 
         bulkDeliveryInputs.forEach((input, index) => {
             input.addEventListener('keydown', (e) => {
+                // If it's the search input with a datalist, let native arrow navigation work for the dropdown
+                if (input === bulkDelItemSearch && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+                    return;
+                }
+
                 if (e.key === 'ArrowDown') {
                     e.preventDefault();
                     const nextInput = bulkDeliveryInputs[index + 1];
@@ -1357,6 +1362,36 @@
         bulkDelItemSearch.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === 'Tab') {
                 e.preventDefault();
+                const typedValue = bulkDelItemSearch.value.trim().toLowerCase();
+
+                if (typedValue) {
+                    let exactMatch = false;
+                    let firstMatch = null;
+
+                    const options = Array.from(itemListBulkDatalist.options);
+                    for (const option of options) {
+                        const optionValue = option.value.toLowerCase();
+                        if (optionValue === typedValue) {
+                            exactMatch = true;
+                            break;
+                        }
+                        if (!firstMatch && optionValue.includes(typedValue)) {
+                            firstMatch = option.value;
+                        }
+                    }
+
+                    if (!exactMatch && firstMatch) {
+                        bulkDelItemSearch.value = firstMatch;
+
+                        // Manually trigger the input event so capacity is updated if needed
+                        const inputEvent = new Event('input', {
+                            bubbles: true,
+                            cancelable: true,
+                        });
+                        bulkDelItemSearch.dispatchEvent(inputEvent);
+                    }
+                }
+
                 const capacity = bulkDelPalletCapacity.value;
                 if (capacity && capacity.trim() !== '') {
                     bulkDelQtyInput.focus();
@@ -1655,6 +1690,11 @@
 
         bulkWithdrawInputs.forEach((input, index) => {
             input.addEventListener('keydown', (e) => {
+                // If it's the search input with a datalist, let native arrow navigation work for the dropdown
+                if (input === bulkWithdrawItemSearch && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+                    return;
+                }
+
                 if (e.key === 'ArrowDown') {
                     e.preventDefault();
                     const nextInput = bulkWithdrawInputs[index + 1];
@@ -1674,6 +1714,29 @@
         bulkWithdrawItemSearch.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === 'Tab') {
                 e.preventDefault();
+                const typedValue = bulkWithdrawItemSearch.value.trim().toLowerCase();
+
+                if (typedValue) {
+                    let exactMatch = false;
+                    let firstMatch = null;
+
+                    const options = Array.from(itemListWithdrawDatalist.options);
+                    for (const option of options) {
+                        const optionValue = option.value.toLowerCase();
+                        if (optionValue === typedValue) {
+                            exactMatch = true;
+                            break;
+                        }
+                        if (!firstMatch && optionValue.includes(typedValue)) {
+                            firstMatch = option.value;
+                        }
+                    }
+
+                    if (!exactMatch && firstMatch) {
+                        bulkWithdrawItemSearch.value = firstMatch;
+                    }
+                }
+
                 bulkWithdrawQtyInput.focus();
             }
         });
