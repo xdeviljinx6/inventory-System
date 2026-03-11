@@ -1207,27 +1207,60 @@
                 };
 
                 const updateDropdown = () => {
-                    const val = input.value.toLowerCase();
-                    const dateMatch = val.match(/\b\d{1,2}[-/]\d{1,2}[-/]\d{2,4}\b/);
-                    const dateStr = dateMatch ? dateMatch[0] : '';
-                    let textPart = val.replace(/\b\d{1,2}[-/]\d{1,2}[-/]\d{2,4}\b/g, '').trim();
+                    const val = input.value;
+                    const trimmedVal = val.trimStart();
+                    if (!trimmedVal) {
+                        dropdown.style.display = 'none';
+                        return;
+                    }
+
+                    const valWords = trimmedVal.toLowerCase().split(/\s+/);
+                    let maxMatchCount = 0;
+                    const matchGroups = [];
+
+                    standardRemarksList.forEach(stdRem => {
+                        const stdWords = stdRem.split(/\s+/);
+                        let matchCount = 0;
+
+                        for (let i = 0; i < valWords.length; i++) {
+                            if (i >= stdWords.length) break;
+
+                            if (stdWords[i] === valWords[i]) {
+                                matchCount++;
+                            } else if (stdWords[i].startsWith(valWords[i])) {
+                                matchCount++;
+                                break;
+                            } else {
+                                break;
+                            }
+                        }
+
+                        if (matchCount > 0) {
+                            maxMatchCount = Math.max(maxMatchCount, matchCount);
+                            if (!matchGroups[matchCount]) matchGroups[matchCount] = [];
+                            matchGroups[matchCount].push(stdRem);
+                        }
+                    });
 
                     dropdown.innerHTML = '';
-                    if (!textPart) {
+                    if (maxMatchCount === 0) {
                         dropdown.style.display = 'none';
                         return;
                     }
 
-                    const matches = standardRemarksList.filter(r => r.includes(textPart));
-                    if (matches.length === 0) {
-                        dropdown.style.display = 'none';
-                        return;
+                    const regex = new RegExp(`^(\\s*(?:\\S+\\s+){${maxMatchCount - 1}}\\S+)(.*)$`, 'i');
+                    const matchResult = val.match(regex);
+                    let remainder = '';
+                    if (matchResult) {
+                        remainder = matchResult[2];
                     }
+
+                    let matches = matchGroups[maxMatchCount];
 
                     matches.forEach((match, index) => {
                         const opt = document.createElement('div');
                         opt.className = 'autocomplete-option';
-                        opt.textContent = dateStr ? `${match} ${dateStr}` : match;
+                        opt.textContent = match + remainder;
                         if (index === 0) {
                             opt.classList.add('active'); // highlight top item by default
                         }
@@ -1270,19 +1303,16 @@
                             options.forEach((opt, idx) => opt.classList.toggle('active', idx === activeIndex));
                             options[activeIndex].scrollIntoView({ block: 'nearest' });
                         }
-                    } else if (e.key === 'Enter' || e.key === 'Tab') {
-                        if (e.key === 'Tab') e.preventDefault();
+                    } else if (e.key === 'Enter') {
+                        // Enter applies the highlighted suggestion and moves focus
+                        e.preventDefault();
                         if (dropdown.style.display === 'block' && options.length > 0 && activeIndex > -1) {
-                            e.preventDefault();
                             input.value = options[activeIndex].textContent;
-                            focusNextOrSave();
-                        } else {
-                            // If no suggestion selected, still shift focus on enter
-                            if(e.key === 'Enter') {
-                                e.preventDefault();
-                                focusNextOrSave();
-                            }
                         }
+                        focusNextOrSave();
+                    } else if (e.key === 'Tab') {
+                        // Tab just moves focus natively, hide dropdown
+                        dropdown.style.display = 'none';
                     }
                 });
             }
