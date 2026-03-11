@@ -1193,19 +1193,6 @@
 
                 let activeIndex = -1;
 
-                const focusNextOrSave = () => {
-                    setTimeout(() => {
-                        dropdown.style.display = 'none';
-                        const inputs = Array.from(dynamicRemarksContainer.querySelectorAll('input'));
-                        const currentIndex = inputs.indexOf(input);
-                        if (currentIndex > -1 && currentIndex < inputs.length - 1) {
-                            inputs[currentIndex + 1].focus();
-                        } else {
-                            saveBreakdownButton.focus();
-                        }
-                    }, 10);
-                };
-
                 const updateDropdown = () => {
                     const val = input.value;
                     const trimmedVal = val.trimStart();
@@ -1268,7 +1255,8 @@
                         opt.addEventListener('mousedown', (e) => {
                             e.preventDefault(); // prevent blur
                             input.value = opt.textContent;
-                            focusNextOrSave();
+                            dropdown.style.display = 'none';
+                            saveBreakdownButton.click(); // Save and close instantly
                         });
                         dropdown.appendChild(opt);
                     });
@@ -1304,14 +1292,16 @@
                             options[activeIndex].scrollIntoView({ block: 'nearest' });
                         }
                     } else if (e.key === 'Enter') {
-                        // Enter applies the highlighted suggestion and moves focus
-                        e.preventDefault();
                         if (dropdown.style.display === 'block' && options.length > 0 && activeIndex > -1) {
+                            e.preventDefault();
                             input.value = options[activeIndex].textContent;
+                            dropdown.style.display = 'none';
+                            saveBreakdownButton.click(); // Save and close instantly
                         }
-                        focusNextOrSave();
+                        // If dropdown is NOT open, we do NOT prevent default.
+                        // The event bubbles up to editBreakdownModal.addEventListener('keydown')
+                        // which natively clicks saveBreakdownButton anyway.
                     } else if (e.key === 'Tab') {
-                        // Tab just moves focus natively, hide dropdown
                         dropdown.style.display = 'none';
                     }
                 });
