@@ -727,6 +727,45 @@
             return parts.join(' | ');
         }
         function getBreakdownParts(breakdownString) { return breakdownString ? breakdownString.split(' | ') : []; }
+
+        function mergeDeliveriesBreakdown(existingQty, newQty, capacity) {
+            if (!capacity) return existingQty + '+' + newQty;
+
+            const allPartsStr = existingQty + '+' + newQty;
+            let normalized = allPartsStr.replace(/\s*\|\s*/g, '+').replace(/×/g, 'x');
+            const parts = normalized.split('+').filter(p => p.trim() !== '');
+
+            let fullCount = 0;
+            let loose = [];
+
+            for (let p of parts) {
+                p = p.trim();
+                const m = p.match(/^(\d+)[xX\*](\d+)$/);
+                if (m) {
+                    const num = parseInt(m[1], 10);
+                    const cap = parseInt(m[2], 10);
+                    if (cap === capacity) {
+                        fullCount += num;
+                    } else {
+                        loose.push(p);
+                    }
+                } else if (parseInt(p, 10) === capacity && !isNaN(p)) {
+                    fullCount += 1;
+                } else {
+                    loose.push(p);
+                }
+            }
+
+            let res = [];
+            if (fullCount > 1) {
+                res.push(`${fullCount}x${capacity}`);
+            } else if (fullCount === 1) {
+                res.push(`${capacity}`);
+            }
+
+            res = res.concat(loose);
+            return res.join('+');
+        }
         function calculateSingleStockingQtyTotal(breakdownString) { return getBreakdownParts(breakdownString).reduce((total, part) => { let value = 0; part = part.trim().replace(/,/g, ''); if (part.includes('×')) { value = part.split('×').reduce((prod, num) => prod * parseFloat(num.trim()), 1); } else { value = parseFloat(part); } return total + (isNaN(value) ? 0 : value); }, 0); }
         const REMARK_COLOR_MAP = [ { keywords: ['hold'], colorClass: 'color-orange' }, { keywords: ['approve', 'approved'], colorClass: 'color-pink' }, { keywords: ['first out', 'old'], colorClass: 'color-green' }, { keywords: [], colorClass: 'color-grey', isDefault: true }];
         function getColorClassForRemark(remark) { const lowerRemark = remark.toLowerCase().trim(); if (!lowerRemark) return REMARK_COLOR_MAP.find(m => m.isDefault)?.colorClass || 'color-default'; for (const mapping of REMARK_COLOR_MAP) { if (!mapping.isDefault && mapping.keywords.some(kw => lowerRemark.startsWith(kw))) return mapping.colorClass; } return REMARK_COLOR_MAP.find(m => m.isDefault)?.colorClass || 'color-default'; }
@@ -1512,6 +1551,9 @@
 
                 const totalQty = calculateSingleStockingQtyTotal(formatStockingQty(qty));
                 qty = generateBreakdownWithCapacity(totalQty, capacity);
+
+                // Ensure generateBreakdown outputs in the user's preferred standard format (+) before merging
+                qty = qty.replace(/\s*\|\s*/g, '+').replace(/×/g, 'x');
             }
 
             const rem = bulkDelSharedRemarks.value.trim();
@@ -1523,7 +1565,21 @@
             }
             const initialRemark = formattedDate ? (rem ? `${rem} ${formattedDate}` : formattedDate) : rem;
 
-            pendingBulkDeliveries.push({code, qty, remarks: initialRemark});
+            const existingIndex = pendingBulkDeliveries.findIndex(item => item.code === code);
+            if (existingIndex > -1) {
+                if (!isNaN(capacity) && capacity > 0) {
+                    pendingBulkDeliveries[existingIndex].qty = mergeDeliveriesBreakdown(pendingBulkDeliveries[existingIndex].qty, qty, capacity);
+                } else {
+                    pendingBulkDeliveries[existingIndex].qty += '+' + qty;
+                }
+
+                if (initialRemark && !pendingBulkDeliveries[existingIndex].remarks.includes(initialRemark)) {
+                    pendingBulkDeliveries[existingIndex].remarks += ' | ' + initialRemark;
+                }
+            } else {
+                pendingBulkDeliveries.push({code, qty, remarks: initialRemark});
+            }
+
             renderBulkList();
             bulkDelItemSearch.value = '';
             bulkDelQtyInput.value = '';
