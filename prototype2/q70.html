@@ -373,14 +373,26 @@
     <div id="bulkClearQtyModal" class="modal"> <div class="modal-content"> <h2>Bulk Clear Stocking Quantities</h2> <div class="filter-section" id="bulkClearFilterSection"> <div class="filter-header"><i class="fas fa-filter"></i> Filter Items</div> <div class="filter-group"> <label for="itemTypeFilter_bulk"><i class="fas fa-box"></i> Item Type:</label> <select id="itemTypeFilter_bulk"> <option value="ALL">All</option><option value="LBL">Labels</option><option value="CTN">Carton</option><option value="PLASTIC">Plastic</option><option value="OTHERS">Other</option> </select> </div> <div class="filter-group"> <label for="remarksFilter_bulk"><i class="fas fa-comment"></i> Remarks:</label> <select id="remarksFilter_bulk"> <option value="ALL">All</option><option value="HOLD">Hold</option><option value="APPROVED">Approved</option><option value="FIRSTOUT_OLD">First Out/Old</option><option value="NO_REMARK">No Remark</option><option value="OTHER_REMARKS">Other</option> </select> </div> <div class="filter-group"> <label for="dataPresenceFilter_bulk"><i class="fas fa-database"></i> Qty Data:</label> <select id="dataPresenceFilter_bulk"> <option value="ALL">All</option><option value="WITH_DATA">With Data</option><option value="WITHOUT_DATA">No Data</option> </select> </div> </div> <div class="bulk-select-actions"> <button id="bulkSelectAll">Select All</button> <button id="bulkDeselectAll">Deselect All</button> </div> <div id="bulkClearList"></div> <div id="bulkClearErrorMessage" class="error-message"></div> <div class="modal-actions"> <button id="confirmBulkClearButton">Clear Selected Quantities</button> <button id="cancelBulkClear">Cancel</button> </div> </div> </div>
 
     <div id="bulkWithdrawModal" class="modal">
-        <div class="modal-content">
-            <h2>Bulk Withdraw Stock</h2>
+        <div class="modal-content" style="max-width:650px;">
+            <h2><i class="fas fa-dolly-flatbed"></i> Bulk Withdraw Stock</h2>
+
             <div class="item-input">
-                <input type="text" id="bulkWithdrawSearch" placeholder="Search for items...">
+                <label>Material Code:</label>
+                <input type="text" id="bulkWithdrawItemSearch" list="itemListWithdraw" placeholder="Start typing to search...">
+                <datalist id="itemListWithdraw"></datalist>
             </div>
-            <div id="bulkWithdrawList" style="max-height: 350px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 4px; margin-top: 15px;">
-                </div>
+
+            <div class="item-input">
+                <label>Qty to Withdraw:</label>
+                <input type="text" id="bulkWithdrawQtyInput" placeholder="e.g. 50">
+            </div>
+
+            <button id="addToListWithdrawBtn" style="background-color: #17a2b8; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 5px;"><i class="fas fa-plus"></i> Add to List</button>
+
+            <div id="pendingWithdrawalListContainer" style="margin-top:15px;"></div>
+
             <div id="bulkWithdrawErrorMessage" class="error-message"></div>
+
             <div class="modal-actions">
                 <button id="confirmBulkWithdrawButton">Confirm Withdraw</button>
                 <button id="cancelBulkWithdraw">Cancel</button>
@@ -483,8 +495,11 @@
 
         openBulkWithdrawModalButton = document.getElementById('openBulkWithdrawModalButton'),
         bulkWithdrawModal = document.getElementById('bulkWithdrawModal'),
-        bulkWithdrawList = document.getElementById('bulkWithdrawList'),
-        bulkWithdrawSearch = document.getElementById('bulkWithdrawSearch'),
+        bulkWithdrawItemSearch = document.getElementById('bulkWithdrawItemSearch'),
+        itemListWithdrawDatalist = document.getElementById('itemListWithdraw'),
+        bulkWithdrawQtyInput = document.getElementById('bulkWithdrawQtyInput'),
+        addToListWithdrawBtn = document.getElementById('addToListWithdrawBtn'),
+        pendingWithdrawalListContainer = document.getElementById('pendingWithdrawalListContainer'),
         bulkWithdrawErrorMessage = document.getElementById('bulkWithdrawErrorMessage'),
         confirmBulkWithdrawButton = document.getElementById('confirmBulkWithdrawButton'),
         cancelBulkWithdraw = document.getElementById('cancelBulkWithdraw'),
@@ -558,6 +573,8 @@
             passwordErrorMessage.textContent = '';
             systemPasswordInput.focus();
         }
+
+        let pendingBulkWithdrawals = [];
 
         function handleUnlock() {
             const pass = systemPasswordInput.value;
@@ -1535,139 +1552,159 @@
             localStorage.setItem('userName', userNameInput.value);
         });
 
-        function populateBulkWithdrawList(searchTerm = '') {
-            bulkWithdrawList.innerHTML = '';
-            bulkWithdrawErrorMessage.textContent = '';
-            let itemsWithStock = originalRowsOrder.filter(row => getWithdrawableStock(row) > 0);
-
-            if (searchTerm) {
-                itemsWithStock = itemsWithStock.filter(row =>
-                    row.dataset.code.toLowerCase().includes(searchTerm)
-                );
-            }
-
-            itemsWithStock.sort((a, b) => {
-                const codeA = a.dataset.code;
-                const codeB = b.dataset.code;
-                const hasQtyA = bulkWithdrawQuantities[codeA] && parseFloat(bulkWithdrawQuantities[codeA]) > 0;
-                const hasQtyB = bulkWithdrawQuantities[codeB] && parseFloat(bulkWithdrawQuantities[codeB]) > 0;
-                if (hasQtyA && !hasQtyB) return -1;
-                if (!hasQtyA && hasQtyB) return 1;
-                return 0;
-            });
-
-            if (itemsWithStock.length === 0) {
-                bulkWithdrawList.innerHTML = '<p style="text-align:center; color:grey;">No items match your search.</p>';
+        function renderWithdrawList() {
+            if (!pendingBulkWithdrawals.length) {
+                pendingWithdrawalListContainer.innerHTML = '<p style="text-align:center;color:#999;">No items added.</p>';
                 return;
             }
-
-            itemsWithStock.forEach(row => {
-                const code = row.dataset.code;
-                const availableStock = getWithdrawableStock(row);
-                const parts = getBreakdownParts(row.dataset.stockingQty);
-                const remarks = JSON.parse(row.dataset.remarks || '[]');
-                const withdrawablePartsHTML = [];
-                parts.forEach((part, index) => {
-                    const remark = (remarks[index] || '').toLowerCase();
-                    if (!remark.startsWith('hold')) {
-                        const colorClass = getColorClassForRemark(remarks[index] || '');
-                        withdrawablePartsHTML.push(`<span class="${colorClass}">${part.trim()}</span>`);
-                    }
-                });
-                const withdrawableBreakdownHTML = withdrawablePartsHTML.join(' | ');
-                const savedQty = bulkWithdrawQuantities[code] || '';
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'bulk-clear-item';
-
-                const hasStock = availableStock > 0;
-                const statusDot = hasStock ? '🟢' : '🔴';
-
-                itemDiv.innerHTML = `
-                    <div class="item-info" style="flex-grow: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 5px;">
-                        <label for="bw-qty-${code}" style="font-weight:bold;">${statusDot} ${code}</label>
-                        <div class="item-qty" style="font-size: 0.9em;">
-                            ${withdrawableBreakdownHTML}
-                            <strong class="total-avail-label" style="margin-left: 10px;">(Total Avail: ${availableStock.toLocaleString()})</strong>
-                        </div>
+            pendingWithdrawalListContainer.innerHTML = pendingBulkWithdrawals.map((item, idx) => {
+                const totalWithdrawQty = calculateSingleStockingQtyTotal(formatStockingQty(item.qty));
+                return `
+                <div class="bulk-del-item" style="flex-direction: row; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; background: #f9fafb; margin-bottom: 5px;">
+                    <div style="flex-grow: 1;">
+                        <span style="font-weight: bold; font-size: 1.1em; display:block;">${item.code}</span>
+                        <span style="font-size: 0.9em; color: #555;">Qty Breakdown: ${item.qty} (Total: <strong>${totalWithdrawQty.toLocaleString()}</strong>)</span>
                     </div>
-                    <input type="text" id="bw-qty-${code}" value="${savedQty}" placeholder="Qty (e.g. 10x50)" data-code="${code}" data-max="${availableStock}" style="width: 140px; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-                `;
-                bulkWithdrawList.appendChild(itemDiv);
-            });
+                    <button onclick="removeWithdrawalItem(${idx})" style="background: #ef4444; color: white; border: none; border-radius: 6px; padding: 4px 8px; cursor: pointer;"><i class="fas fa-times"></i></button>
+                </div>
+            `;
+            }).join('');
         }
+
+        window.removeWithdrawalItem = function(idx) {
+            pendingBulkWithdrawals.splice(idx, 1);
+            renderWithdrawList();
+        };
 
         openBulkWithdrawModalButton.addEventListener('click', () => {
             checkAccess(() => {
-                bulkWithdrawQuantities = {};
-                bulkWithdrawSearch.value = '';
-                populateBulkWithdrawList();
+                itemListWithdrawDatalist.innerHTML = '';
+
+                const sortedRows = [...originalRowsOrder].sort((a, b) => {
+                    const stockA = getWithdrawableStock(a);
+                    const stockB = getWithdrawableStock(b);
+                    if (stockA > 0 && stockB <= 0) return -1;
+                    if (stockA <= 0 && stockB > 0) return 1;
+                    return (a.dataset.code || '').localeCompare(b.dataset.code || '');
+                });
+
+                sortedRows.forEach(row => {
+                    const code = row.dataset.code;
+                    const withdrawableStock = getWithdrawableStock(row);
+                    if (withdrawableStock > 0) {
+                        const option = document.createElement('option');
+                        option.value = code;
+                        option.label = `🟢 Avail: ${withdrawableStock.toLocaleString()}`;
+                        itemListWithdrawDatalist.appendChild(option);
+                    }
+                });
+
+                pendingBulkWithdrawals = [];
+                bulkWithdrawItemSearch.value = '';
+                bulkWithdrawQtyInput.value = '';
+                bulkWithdrawErrorMessage.innerHTML = '';
+                renderWithdrawList();
                 bulkWithdrawModal.style.display = 'block';
-                setTimeout(() => bulkWithdrawSearch.focus(), 100);
+                setTimeout(() => bulkWithdrawItemSearch.focus(), 100);
             });
         });
 
-        bulkWithdrawSearch.addEventListener('input', () => {
-            populateBulkWithdrawList(bulkWithdrawSearch.value.toLowerCase());
-        });
+        const bulkWithdrawInputs = [
+            bulkWithdrawItemSearch,
+            bulkWithdrawQtyInput
+        ];
 
-        bulkWithdrawSearch.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                const firstInput = bulkWithdrawList.querySelector('input[type="text"]');
-                if (firstInput) {
-                    firstInput.focus();
-                }
-            }
-        });
-
-        bulkWithdrawList.addEventListener('input', (event) => {
-            if (event.target.type === 'text' && event.target.dataset.code) {
-                const code = event.target.dataset.code;
-                const quantity = event.target.value;
-                bulkWithdrawQuantities[code] = quantity;
-
-                const activeElementId = event.target.id;
-                const selectionStart = event.target.selectionStart;
-                const selectionEnd = event.target.selectionEnd;
-
-                populateBulkWithdrawList(bulkWithdrawSearch.value.toLowerCase());
-
-                const newActiveElement = document.getElementById(activeElementId);
-                if (newActiveElement) {
-                    newActiveElement.focus();
-                    newActiveElement.setSelectionRange(selectionStart, selectionEnd);
-                }
-            }
-        });
-
-        bulkWithdrawList.addEventListener('keydown', (event) => {
-            if (event.target.tagName === 'INPUT' && event.target.type === 'text') {
-                if (event.key === 'Enter') {
-                    event.preventDefault(); // Prevent form submission if any
-                    bulkWithdrawSearch.value = ''; // Clear search box
-                    populateBulkWithdrawList(); // Refresh list to show all items
-                    bulkWithdrawSearch.focus(); // Move cursor to search box
-                } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-                    event.preventDefault();
-                    const inputs = Array.from(bulkWithdrawList.querySelectorAll('input[type="text"]'));
-                    const currentIndex = inputs.indexOf(event.target);
-
-                    if (event.key === 'ArrowDown') {
-                        const nextInput = inputs[currentIndex + 1];
-                        if (nextInput) {
-                            nextInput.focus();
-                        }
-                    } else if (event.key === 'ArrowUp') {
-                        const prevInput = inputs[currentIndex - 1];
-                        if (prevInput) {
-                            prevInput.focus();
-                        } else {
-                            // If at the top, go back to search
-                            bulkWithdrawSearch.focus();
-                        }
+        bulkWithdrawInputs.forEach((input, index) => {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const nextInput = bulkWithdrawInputs[index + 1];
+                    if (nextInput) {
+                        nextInput.focus();
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const prevInput = bulkWithdrawInputs[index - 1];
+                    if (prevInput) {
+                        prevInput.focus();
                     }
                 }
+            });
+        });
+
+        bulkWithdrawItemSearch.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === 'Tab') {
+                e.preventDefault();
+                bulkWithdrawQtyInput.focus();
             }
+        });
+
+        bulkWithdrawQtyInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addToListWithdrawBtn.click();
+            }
+        });
+
+        addToListWithdrawBtn.addEventListener('click', () => {
+            const code = bulkWithdrawItemSearch.value.trim();
+            const newQtyString = bulkWithdrawQtyInput.value.trim();
+
+            if (!code || !newQtyString) {
+                bulkWithdrawErrorMessage.textContent = 'Material Code and Quantity are required.';
+                return;
+            }
+
+            const row = originalRowsOrder.find(r => r.dataset.code === code);
+            if (!row) {
+                bulkWithdrawErrorMessage.textContent = `Item code ${code} not found.`;
+                return;
+            }
+
+            const maxWithdrawable = getWithdrawableStock(row);
+
+            // Calculate total of what we are TRYING to add right now
+            const newQtyTotal = calculateSingleStockingQtyTotal(formatStockingQty(newQtyString));
+
+            if (newQtyTotal <= 0) {
+                 bulkWithdrawErrorMessage.textContent = 'Please enter a valid quantity greater than 0.';
+                 return;
+            }
+
+            // Check if it already exists in our pending list
+            const existingIndex = pendingBulkWithdrawals.findIndex(item => item.code === code);
+
+            let combinedQtyString = newQtyString;
+            let combinedTotal = newQtyTotal;
+
+            if (existingIndex > -1) {
+                const existingItem = pendingBulkWithdrawals[existingIndex];
+                // Append the new qty string (e.g., "10" + "+50")
+                combinedQtyString = existingItem.qty + "+" + newQtyString;
+                combinedTotal = calculateSingleStockingQtyTotal(formatStockingQty(combinedQtyString));
+            }
+
+            if (combinedTotal > maxWithdrawable) {
+                bulkWithdrawErrorMessage.innerHTML = `Cannot withdraw <strong>${combinedTotal.toLocaleString()}</strong>.<br>Only <strong>${maxWithdrawable.toLocaleString()}</strong> is available for ${code}.`;
+                return;
+            }
+
+            bulkWithdrawErrorMessage.innerHTML = '';
+
+            if (existingIndex > -1) {
+                // Update existing
+                pendingBulkWithdrawals[existingIndex].qty = combinedQtyString;
+            } else {
+                // Add new
+                pendingBulkWithdrawals.push({ code: code, qty: newQtyString });
+            }
+
+            renderWithdrawList();
+
+            // Clear and refocus for sequential entry
+            bulkWithdrawItemSearch.value = '';
+            bulkWithdrawQtyInput.value = '';
+            bulkWithdrawItemSearch.focus();
         });
 
         cancelBulkWithdraw.addEventListener('click', () => {
@@ -1675,41 +1712,29 @@
         });
 
         confirmBulkWithdrawButton.addEventListener('click', () => {
-            const inputs = bulkWithdrawList.querySelectorAll('input[type="text"]');
-            let withdrawalsToProcess = [];
-            let errors = [];
-            inputs.forEach(input => {
-                const qty = calculateSingleStockingQtyTotal(formatStockingQty(input.value));
-                if (qty > 0) {
-                    const code = input.dataset.code;
-                    const maxQty = parseFloat(input.dataset.max);
-                    if (qty > maxQty) {
-                        errors.push(`For ${code}: Cannot withdraw ${qty}. Only ${maxQty} is available.`);
-                    } else {
-                        withdrawalsToProcess.push({ code, qty });
-                    }
-                }
-            });
-            if (errors.length > 0) {
-                bulkWithdrawErrorMessage.innerHTML = errors.join('<br>');
-                return;
-            }
-            if (withdrawalsToProcess.length === 0) {
+            if (pendingBulkWithdrawals.length === 0) {
                 bulkWithdrawErrorMessage.textContent = 'Please enter a quantity for at least one item.';
                 return;
             }
-            if (!confirm(`You are about to withdraw from ${withdrawalsToProcess.length} item(s). Continue?`)) {
+
+            if (!confirm(`You are about to withdraw from ${pendingBulkWithdrawals.length} item(s). Continue?`)) {
                 return;
             }
+
             let successfulWithdrawals = 0;
             let transactionDetails = [];
-            withdrawalsToProcess.forEach(item => {
-                const result = performWithdrawal(item.code, item.qty);
+
+            pendingBulkWithdrawals.forEach(item => {
+                const totalWithdrawQty = calculateSingleStockingQtyTotal(formatStockingQty(item.qty));
+                const result = performWithdrawal(item.code, totalWithdrawQty);
                 if (result.success) {
                     successfulWithdrawals++;
-                    transactionDetails.push(`${item.code} (-${item.qty.toLocaleString()})`);
+                    transactionDetails.push(`${item.code} (-${totalWithdrawQty.toLocaleString()})`);
+                } else {
+                    console.error(result.message);
                 }
             });
+
             if (successfulWithdrawals > 0) {
                 saveInventoryToLocalStorage();
                 applyFiltersAndSort();
