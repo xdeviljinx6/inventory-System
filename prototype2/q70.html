@@ -126,8 +126,25 @@
         body.dark-mode .bulk-clear-item label { color: #ccc; }
         body.dark-mode .bulk-clear-item .item-qty { color: #999; }
         body.dark-mode #bulkClearList, body.dark-mode #bulkWithdrawList, body.dark-mode #bulkDeliveryList { border-color: #444; }
+
+        /* Custom Autocomplete Styles */
+        .autocomplete-wrapper { position: relative; width: 100%; }
+        .autocomplete-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #d1d5db; border-top: none; border-radius: 0 0 8px 8px; z-index: 99; max-height: 150px; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none; }
+        .autocomplete-option { padding: 10px; cursor: pointer; color: #333; }
+        .autocomplete-option:hover, .autocomplete-option.active { background-color: #f3f4f6; }
+        body.dark-mode .autocomplete-dropdown { background: #2d2d2d; border-color: #444; }
+        body.dark-mode .autocomplete-option { color: #eee; }
+        body.dark-mode .autocomplete-option:hover, body.dark-mode .autocomplete-option.active { background-color: #444; }
         body.dark-mode .bulk-clear-item { border-bottom-color: #333; }
         body.dark-mode .history-header h2 { color: #64b5f6; }
+        body.dark-mode #transactionHistoryToggle { background-color: #374151 !important; border-color: #4b5563 !important; }
+        body.dark-mode #transactionHistoryToggle h2 { color: #64b5f6 !important; }
+        body.dark-mode #transactionHistoryToggle i { color: #d1d5db !important; }
+        #transactionHistoryToggle:hover { background-color: #e2e6ea !important; }
+        body.dark-mode #transactionHistoryToggle:hover { background-color: #4b5563 !important; }
+
+        body.dark-mode .withdraw-qty-label { color: #d1d5db; }
+        body.dark-mode .withdraw-total-label { color: #fff; }
 
         .print-options-container { margin: 15px 0; display: flex; flex-direction: column; gap: 10px; border: 1px solid #e5e7eb; padding: 15px; border-radius: 12px; background-color: #f9fafb; }
         body.dark-mode .print-options-container { background-color: #374151; border-color: #4b5563; }
@@ -144,6 +161,10 @@
         body.dark-mode #exportExcelButton { background-color: #6b7280; color: white; }
         body.dark-mode #printInventoryButton { background-color: #f59e0b; color: white; }
         body.dark-mode #clearInventoryButton { background-color: #ef4444; color: white; }
+
+        body.dark-mode .bulk-del-item { background-color: #374151 !important; border-color: #4b5563 !important; }
+        body.dark-mode .bulk-del-item input { background-color: #1f2937; color: #fff; border-color: #4b5563; }
+        body.dark-mode .bulk-del-item input::placeholder { color: #9ca3af; }
 
         body.dark-mode .bulk-del-item { background-color: #374151 !important; border-color: #4b5563 !important; }
         body.dark-mode .bulk-del-item input { background-color: #1f2937; color: #fff; border-color: #4b5563; }
@@ -279,20 +300,25 @@
             </table>
         </div>
         <hr>
-        <div class="history-header">
-            <h2><i class="fas fa-history"></i> Transaction History</h2>
-            <button id="clearHistoryButton"><i class="fas fa-trash-alt"></i> Clear History</button>
+        <div class="history-header" id="transactionHistoryToggle" style="cursor: pointer; padding: 10px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; justify-content: flex-start; gap: 10px; transition: background-color 0.2s;">
+            <h2 style="margin: 0; font-size: 1.3em; color: #333;"><i class="fas fa-history"></i> Transaction History</h2>
+            <i class="fas fa-chevron-down" id="transactionHistoryIcon" style="color: #6c757d; font-size: 1.2em;"></i>
         </div>
-        <div class="filter-section" style="padding: 15px; margin-top: 10px; margin-bottom: 10px; gap: 15px;">
-            <div class="filter-group"> <label for="historyDateFrom"><i class="fas fa-calendar-alt"></i> From:</label> <input type="date" id="historyDateFrom"> </div>
-            <div class="filter-group"> <label for="historyDateTo"><i class="fas fa-calendar-alt"></i> To:</label> <input type="date" id="historyDateTo"> </div>
-            <div class="filter-group"> <button id="resetHistoryFilter" style="background-color: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;"><i class="fas fa-undo"></i> Reset</button> </div>
-        </div>
-        <div class="table-container">
-            <table id="historyTable">
-                <thead> <tr> <th>Date & Time</th> <th>Action</th> <th>Material Code</th> <th>Details</th> </tr> </thead>
-                <tbody id="historyTableBody"></tbody>
-            </table>
+        <div id="transactionHistoryContent" style="display: none; padding-top: 10px;">
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                <button id="clearHistoryButton"><i class="fas fa-trash-alt"></i> Clear History</button>
+            </div>
+            <div class="filter-section" style="padding: 15px; margin-top: 0; margin-bottom: 10px; gap: 15px;">
+                <div class="filter-group"> <label for="historyDateFrom"><i class="fas fa-calendar-alt"></i> From:</label> <input type="date" id="historyDateFrom"> </div>
+                <div class="filter-group"> <label for="historyDateTo"><i class="fas fa-calendar-alt"></i> To:</label> <input type="date" id="historyDateTo"> </div>
+                <div class="filter-group"> <button id="resetHistoryFilter" style="background-color: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;"><i class="fas fa-undo"></i> Reset</button> </div>
+            </div>
+            <div class="table-container">
+                <table id="historyTable">
+                    <thead> <tr> <th>Date & Time</th> <th>Action</th> <th>Material Code</th> <th>Details</th> </tr> </thead>
+                    <tbody id="historyTableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -363,14 +389,26 @@
     <div id="bulkClearQtyModal" class="modal"> <div class="modal-content"> <h2>Bulk Clear Stocking Quantities</h2> <div class="filter-section" id="bulkClearFilterSection"> <div class="filter-header"><i class="fas fa-filter"></i> Filter Items</div> <div class="filter-group"> <label for="itemTypeFilter_bulk"><i class="fas fa-box"></i> Item Type:</label> <select id="itemTypeFilter_bulk"> <option value="ALL">All</option><option value="LBL">Labels</option><option value="CTN">Carton</option><option value="PLASTIC">Plastic</option><option value="OTHERS">Other</option> </select> </div> <div class="filter-group"> <label for="remarksFilter_bulk"><i class="fas fa-comment"></i> Remarks:</label> <select id="remarksFilter_bulk"> <option value="ALL">All</option><option value="HOLD">Hold</option><option value="APPROVED">Approved</option><option value="FIRSTOUT_OLD">First Out/Old</option><option value="NO_REMARK">No Remark</option><option value="OTHER_REMARKS">Other</option> </select> </div> <div class="filter-group"> <label for="dataPresenceFilter_bulk"><i class="fas fa-database"></i> Qty Data:</label> <select id="dataPresenceFilter_bulk"> <option value="ALL">All</option><option value="WITH_DATA">With Data</option><option value="WITHOUT_DATA">No Data</option> </select> </div> </div> <div class="bulk-select-actions"> <button id="bulkSelectAll">Select All</button> <button id="bulkDeselectAll">Deselect All</button> </div> <div id="bulkClearList"></div> <div id="bulkClearErrorMessage" class="error-message"></div> <div class="modal-actions"> <button id="confirmBulkClearButton">Clear Selected Quantities</button> <button id="cancelBulkClear">Cancel</button> </div> </div> </div>
 
     <div id="bulkWithdrawModal" class="modal">
-        <div class="modal-content">
-            <h2>Bulk Withdraw Stock</h2>
+        <div class="modal-content" style="max-width:650px;">
+            <h2><i class="fas fa-dolly-flatbed"></i> Bulk Withdraw Stock</h2>
+
             <div class="item-input">
-                <input type="text" id="bulkWithdrawSearch" placeholder="Search for items...">
+                <label>Material Code:</label>
+                <input type="text" id="bulkWithdrawItemSearch" list="itemListWithdraw" placeholder="Start typing to search...">
+                <datalist id="itemListWithdraw"></datalist>
             </div>
-            <div id="bulkWithdrawList" style="max-height: 350px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 4px; margin-top: 15px;">
-                </div>
+
+            <div class="item-input">
+                <label>Qty to Withdraw:</label>
+                <input type="text" id="bulkWithdrawQtyInput" placeholder="e.g. 50">
+            </div>
+
+            <button id="addToListWithdrawBtn" style="background-color: #17a2b8; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 5px;"><i class="fas fa-plus"></i> Add to List</button>
+
+            <div id="pendingWithdrawalListContainer" style="margin-top:15px;"></div>
+
             <div id="bulkWithdrawErrorMessage" class="error-message"></div>
+
             <div class="modal-actions">
                 <button id="confirmBulkWithdrawButton">Confirm Withdraw</button>
                 <button id="cancelBulkWithdraw">Cancel</button>
@@ -385,7 +423,17 @@
             <div style="display:flex;gap:10px;margin-bottom:15px;">
             <div class="item-input" style="flex:1;">
                 <label>Shared Remarks:</label>
-                <input type="text" id="bulkDelSharedRemarks" placeholder="Optional">
+                <input type="text" id="bulkDelSharedRemarks" list="sharedRemarksDatalist" placeholder="Optional">
+                <datalist id="sharedRemarksDatalist">
+                    <option value="approved">
+                    <option value="approved temp specs">
+                    <option value="approved new declaration">
+                    <option value="old">
+                    <option value="first out">
+                    <option value="hold">
+                    <option value="hold temp specs">
+                    <option value="hold new declaration">
+                </datalist>
             </div>
             <div class="item-input" style="flex:1;">
                 <label>Shared Date:</label>
@@ -473,8 +521,11 @@
 
         openBulkWithdrawModalButton = document.getElementById('openBulkWithdrawModalButton'),
         bulkWithdrawModal = document.getElementById('bulkWithdrawModal'),
-        bulkWithdrawList = document.getElementById('bulkWithdrawList'),
-        bulkWithdrawSearch = document.getElementById('bulkWithdrawSearch'),
+        bulkWithdrawItemSearch = document.getElementById('bulkWithdrawItemSearch'),
+        itemListWithdrawDatalist = document.getElementById('itemListWithdraw'),
+        bulkWithdrawQtyInput = document.getElementById('bulkWithdrawQtyInput'),
+        addToListWithdrawBtn = document.getElementById('addToListWithdrawBtn'),
+        pendingWithdrawalListContainer = document.getElementById('pendingWithdrawalListContainer'),
         bulkWithdrawErrorMessage = document.getElementById('bulkWithdrawErrorMessage'),
         confirmBulkWithdrawButton = document.getElementById('confirmBulkWithdrawButton'),
         cancelBulkWithdraw = document.getElementById('cancelBulkWithdraw'),
@@ -514,7 +565,10 @@
         compareVarianceButton = document.getElementById('compareVarianceButton'),
         varianceTableBody = document.getElementById('varianceTableBody'),
         varianceErrorMessage = document.getElementById('varianceErrorMessage'),
-        closeVarianceModalButton = document.getElementById('closeVarianceModalButton');
+        closeVarianceModalButton = document.getElementById('closeVarianceModalButton'),
+        transactionHistoryToggle = document.getElementById('transactionHistoryToggle'),
+        transactionHistoryContent = document.getElementById('transactionHistoryContent'),
+        transactionHistoryIcon = document.getElementById('transactionHistoryIcon');
 
         let loadedWorkbook = null, originalRowsOrder = [], transactionHistory = [], currentEditingRow = null, pendingAction = null;
         let bulkWithdrawQuantities = {};
@@ -545,6 +599,8 @@
             passwordErrorMessage.textContent = '';
             systemPasswordInput.focus();
         }
+
+        let pendingBulkWithdrawals = [];
 
         function handleUnlock() {
             const pass = systemPasswordInput.value;
@@ -690,6 +746,45 @@
             return parts.join(' | ');
         }
         function getBreakdownParts(breakdownString) { return breakdownString ? breakdownString.split(' | ') : []; }
+
+        function mergeDeliveriesBreakdown(existingQty, newQty, capacity) {
+            if (!capacity) return existingQty + '+' + newQty;
+
+            const allPartsStr = existingQty + '+' + newQty;
+            let normalized = allPartsStr.replace(/\s*\|\s*/g, '+').replace(/×/g, 'x');
+            const parts = normalized.split('+').filter(p => p.trim() !== '');
+
+            let fullCount = 0;
+            let loose = [];
+
+            for (let p of parts) {
+                p = p.trim();
+                const m = p.match(/^(\d+)[xX\*](\d+)$/);
+                if (m) {
+                    const num = parseInt(m[1], 10);
+                    const cap = parseInt(m[2], 10);
+                    if (cap === capacity) {
+                        fullCount += num;
+                    } else {
+                        loose.push(p);
+                    }
+                } else if (parseInt(p, 10) === capacity && !isNaN(p)) {
+                    fullCount += 1;
+                } else {
+                    loose.push(p);
+                }
+            }
+
+            let res = [];
+            if (fullCount > 1) {
+                res.push(`${fullCount}x${capacity}`);
+            } else if (fullCount === 1) {
+                res.push(`${capacity}`);
+            }
+
+            res = res.concat(loose);
+            return res.join('+');
+        }
         function calculateSingleStockingQtyTotal(breakdownString) { return getBreakdownParts(breakdownString).reduce((total, part) => { let value = 0; part = part.trim().replace(/,/g, ''); if (part.includes('×')) { value = part.split('×').reduce((prod, num) => prod * parseFloat(num.trim()), 1); } else { value = parseFloat(part); } return total + (isNaN(value) ? 0 : value); }, 0); }
         const REMARK_COLOR_MAP = [ { keywords: ['hold'], colorClass: 'color-orange' }, { keywords: ['approve', 'approved'], colorClass: 'color-pink' }, { keywords: ['first out', 'old'], colorClass: 'color-green' }, { keywords: [], colorClass: 'color-grey', isDefault: true }];
         function getColorClassForRemark(remark) { const lowerRemark = remark.toLowerCase().trim(); if (!lowerRemark) return REMARK_COLOR_MAP.find(m => m.isDefault)?.colorClass || 'color-default'; for (const mapping of REMARK_COLOR_MAP) { if (!mapping.isDefault && mapping.keywords.some(kw => lowerRemark.startsWith(kw))) return mapping.colorClass; } return REMARK_COLOR_MAP.find(m => m.isDefault)?.colorClass || 'color-default'; }
@@ -906,6 +1001,7 @@
                         table { width: 100%; border-collapse: collapse; margin-top: 0px; }
                         th, td { border: 1px solid black; padding: 2px 5px; text-align: left; font-size: 0.9em; }
                         th { background-color: #d3d3d3; font-weight: bold; }
+                        tbody tr:nth-child(even) td { background-color: #e5e5e5 !important; }
                         .footer { margin-top: 15px; font-weight: bold; font-size: 0.95em; }
                         .color-green { color: green; font-weight: bold; }
                         .color-orange { color: orange; font-weight: bold; }
@@ -1063,7 +1159,156 @@
         function applyBulkClearFilters() { const itemType = document.getElementById('itemTypeFilter_bulk').value; const remarkType = document.getElementById('remarksFilter_bulk').value; const dataType = dataPresenceFilter_bulk.value; const filteredRows = originalRowsOrder.filter(row => { const code = row.dataset.code.toUpperCase(); const remarks = JSON.parse(row.dataset.remarks || '[]').map(r => r.toLowerCase().trim()); const qtyText = row.cells[1].textContent.trim(); const passesItem = itemType === 'ALL' || (itemType === 'LBL' && code.startsWith('LBL')) || (itemType === 'CTN' && code.startsWith('CTN')) || (itemType === 'PLASTIC' && (code.startsWith('BAG') || code.includes('BUNDLE'))) || (itemType === 'OTHERS' && !/^(LBL|CTN|BAG)|BUNDLE/.test(code)); const passesData = dataType === 'ALL' || (dataType === 'WITH_DATA' && qtyText) || (dataType === 'WITHOUT_DATA' && !qtyText); let passesRemark = false; const hasHold = remarks.some(r => r.startsWith('hold')); const hasApproved = remarks.some(r => r.startsWith('approve') || r.startsWith('approved')); const hasOld = remarks.some(r => r.startsWith('first out') || r.startsWith('old')); const hasAnyRemark = remarks.some(r => r !== ''); switch (remarkType) { case 'ALL': passesRemark = true; break; case 'HOLD': passesRemark = hasHold; break; case 'APPROVED': passesRemark = hasApproved; break; case 'FIRSTOUT_OLD': passesRemark = hasOld; break; case 'NO_REMARK': passesRemark = !hasAnyRemark; break; case 'OTHER_REMARKS': passesRemark = hasAnyRemark && !hasHold && !hasApproved && !hasOld; break; } return passesItem && passesRemark && passesData; }); populateBulkClearList(filteredRows); }
         function handleFileSelect(file) { if (!file) return; const reader = new FileReader(); reader.onload = (e) => { try { loadedWorkbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' }); excelSheetSelect.innerHTML = ''; loadedWorkbook.SheetNames.forEach(name => { excelSheetSelect.innerHTML += `<option value="${name}">${name}</option>`; }); handleSheetChange(); importDataModal.style.display = 'block'; importErrorMessageDiv.textContent = ''; } catch (err) { importErrorMessageDiv.textContent = 'Error reading file.'; } }; reader.readAsArrayBuffer(file); }
         function handleSheetChange() { const sheetName = excelSheetSelect.value; const worksheet = loadedWorkbook.Sheets[sheetName]; const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }); stockingQtyDateSelectModal.innerHTML = '<option value="">Do not import</option>'; if (data.length >= STOCKING_QTY_ROW_EXCEL_INDEX) { const headerRow = data[5] || []; let counter = 1; headerRow.forEach((h, i) => { if (typeof h === 'string' && h.trim().toLowerCase().includes('stocking qty')) { stockingQtyDateSelectModal.innerHTML += `<option value="${i}">Stocking Qty ${counter++}</option>`; } }); } }
-        function generateRemarksInputs(numParts, remarks) { dynamicRemarksContainer.innerHTML = ''; for (let i = 0; i < numParts; i++) { const inputGroup = document.createElement('div'); inputGroup.className = 'item-input'; const label = document.createElement('label'); label.textContent = `Remarks for Part ${i + 1}:`; const input = document.createElement('input'); input.type = 'text'; input.value = remarks[i] || ''; inputGroup.append(label, input); dynamicRemarksContainer.appendChild(inputGroup); } };
+        const standardRemarksList = [
+            'approved',
+            'approved temp specs',
+            'approved new declaration',
+            'old',
+            'first out',
+            'hold',
+            'hold temp specs',
+            'hold new declaration'
+        ];
+
+        function generateRemarksInputs(numParts, remarks) {
+            dynamicRemarksContainer.innerHTML = '';
+            for (let i = 0; i < numParts; i++) {
+                const inputGroup = document.createElement('div');
+                inputGroup.className = 'item-input';
+                const label = document.createElement('label');
+                label.textContent = `Remarks for Part ${i + 1}:`;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'autocomplete-wrapper';
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = remarks[i] || '';
+
+                const dropdown = document.createElement('div');
+                dropdown.className = 'autocomplete-dropdown';
+
+                wrapper.append(input, dropdown);
+                inputGroup.append(label, wrapper);
+                dynamicRemarksContainer.appendChild(inputGroup);
+
+                let activeIndex = -1;
+
+                const updateDropdown = () => {
+                    const val = input.value;
+                    const trimmedVal = val.trimStart();
+                    if (!trimmedVal) {
+                        dropdown.style.display = 'none';
+                        return;
+                    }
+
+                    const valWords = trimmedVal.toLowerCase().split(/\s+/);
+                    let maxMatchCount = 0;
+                    const matchGroups = [];
+
+                    standardRemarksList.forEach(stdRem => {
+                        const stdWords = stdRem.split(/\s+/);
+                        let matchCount = 0;
+
+                        for (let i = 0; i < valWords.length; i++) {
+                            if (i >= stdWords.length) break;
+
+                            if (stdWords[i] === valWords[i]) {
+                                matchCount++;
+                            } else if (stdWords[i].startsWith(valWords[i])) {
+                                matchCount++;
+                                break;
+                            } else {
+                                break;
+                            }
+                        }
+
+                        if (matchCount > 0) {
+                            maxMatchCount = Math.max(maxMatchCount, matchCount);
+                            if (!matchGroups[matchCount]) matchGroups[matchCount] = [];
+                            matchGroups[matchCount].push(stdRem);
+                        }
+                    });
+
+                    dropdown.innerHTML = '';
+                    if (maxMatchCount === 0) {
+                        dropdown.style.display = 'none';
+                        return;
+                    }
+
+                    const regex = new RegExp(`^(\\s*(?:\\S+\\s+){${maxMatchCount - 1}}\\S+)(.*)$`, 'i');
+                    const matchResult = val.match(regex);
+                    let remainder = '';
+                    if (matchResult) {
+                        remainder = matchResult[2];
+                    }
+
+                    let matches = matchGroups[maxMatchCount];
+
+                    matches.forEach((match, index) => {
+                        const opt = document.createElement('div');
+                        opt.className = 'autocomplete-option';
+                        opt.textContent = match + remainder;
+                        if (index === 0) {
+                            opt.classList.add('active'); // highlight top item by default
+                        }
+
+                        opt.addEventListener('mousedown', (e) => {
+                            e.preventDefault(); // prevent blur
+                            input.value = opt.textContent;
+                            dropdown.style.display = 'none';
+                            saveBreakdownButton.focus(); // Move focus to save button so the next Enter saves the form
+                        });
+                        dropdown.appendChild(opt);
+                    });
+
+                    activeIndex = 0;
+                    dropdown.style.display = 'block';
+                };
+
+                input.addEventListener('input', updateDropdown);
+
+                input.addEventListener('focus', () => {
+                    if (input.value.trim() !== '') updateDropdown();
+                });
+
+                input.addEventListener('blur', () => {
+                    setTimeout(() => dropdown.style.display = 'none', 100);
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    const options = dropdown.querySelectorAll('.autocomplete-option');
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        if (options.length > 0) {
+                            if (activeIndex < options.length - 1) activeIndex++;
+                            options.forEach((opt, idx) => opt.classList.toggle('active', idx === activeIndex));
+                            options[activeIndex].scrollIntoView({ block: 'nearest' });
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        if (options.length > 0) {
+                            if (activeIndex > 0) activeIndex--;
+                            options.forEach((opt, idx) => opt.classList.toggle('active', idx === activeIndex));
+                            options[activeIndex].scrollIntoView({ block: 'nearest' });
+                        }
+                    } else if (e.key === 'Enter') {
+                        if (dropdown.style.display === 'block' && options.length > 0 && activeIndex > -1) {
+                            e.preventDefault();
+                            e.stopPropagation(); // Prevent modal's global Enter listener from catching this and saving
+                            input.value = options[activeIndex].textContent;
+                            dropdown.style.display = 'none';
+                            saveBreakdownButton.focus(); // Move focus to save button so the next Enter saves the form
+                        }
+                        // If dropdown is NOT open, we do NOT prevent default or stop propagation.
+                        // The event bubbles up to editBreakdownModal.addEventListener('keydown')
+                        // which natively clicks saveBreakdownButton to save the form.
+                    } else if (e.key === 'Tab') {
+                        dropdown.style.display = 'none';
+                    }
+                });
+            }
+        };
         function getWithdrawableStock(row) { const stockingQty = row.dataset.stockingQty; const remarks = JSON.parse(row.dataset.remarks || '[]'); const parts = getBreakdownParts(formatStockingQty(stockingQty)); let total = 0; parts.forEach((part, index) => { const remark = (remarks[index] || '').toLowerCase(); if (!remark.startsWith('hold')) { total += calculateSingleStockingQtyTotal(part); } }); return total; };
 
         function performWithdrawal(materialCode, withdrawAmount) {
@@ -1279,11 +1524,208 @@
                 bulkDelPalletCapacity.value = '';
                 bulkDelQtyInput.value = '';
                 bulkDelSharedRemarks.value = '';
-                bulkDelSharedDate.value = '';
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                bulkDelSharedDate.value = `${year}-${month}-${day}`;
                 renderBulkList();
 
                 bulkDeliveriesModal.style.display = 'block';
+                setTimeout(() => bulkDelSharedRemarks.focus(), 100);
             });
+        });
+
+        const bulkDeliveryInputs = [
+            bulkDelSharedRemarks,
+            bulkDelSharedDate,
+            bulkDelItemSearch,
+            bulkDelPalletCapacity,
+            bulkDelQtyInput
+        ];
+
+        bulkDeliveryInputs.forEach((input, index) => {
+            input.addEventListener('keydown', (e) => {
+                // If it's an input with a datalist, let native arrow navigation work for the dropdown
+                if ((input === bulkDelItemSearch || input === bulkDelSharedRemarks) && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+                    return;
+                }
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const nextInput = bulkDeliveryInputs[index + 1];
+                    if (nextInput) {
+                        nextInput.focus();
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const prevInput = bulkDeliveryInputs[index - 1];
+                    if (prevInput) {
+                        prevInput.focus();
+                    }
+                }
+            });
+        });
+
+        // Autocomplete and focus logic for Shared Remarks Datalist
+        bulkDelSharedRemarks.addEventListener('input', (e) => {
+            if (e.inputType === 'insertReplacementText') {
+                setTimeout(() => bulkDelSharedDate.focus(), 10);
+            }
+        });
+
+        bulkDelSharedRemarks.addEventListener('change', () => {
+            const typedValue = bulkDelSharedRemarks.value.trim().toLowerCase();
+            const options = Array.from(document.getElementById('sharedRemarksDatalist').options);
+            const exactMatch = options.some(opt => opt.value.toLowerCase() === typedValue);
+            if (exactMatch) {
+                setTimeout(() => bulkDelSharedDate.focus(), 10);
+            }
+        });
+
+        bulkDelSharedRemarks.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === 'Tab') {
+                if (e.key === 'Tab') e.preventDefault();
+                setTimeout(() => {
+                    if (document.activeElement === bulkDelSharedDate) return;
+
+                    const typedValue = bulkDelSharedRemarks.value.trim().toLowerCase();
+                    if (typedValue) {
+                        let exactMatch = false;
+                        let firstMatch = null;
+                        const options = Array.from(document.getElementById('sharedRemarksDatalist').options);
+                        for (const option of options) {
+                            const optionValue = option.value.toLowerCase();
+                            if (optionValue === typedValue) {
+                                exactMatch = true;
+                                break;
+                            }
+                            if (!firstMatch && optionValue.includes(typedValue)) {
+                                firstMatch = option.value;
+                            }
+                        }
+                        if (exactMatch) {
+                            bulkDelSharedDate.focus();
+                            return;
+                        }
+                        if (!exactMatch && firstMatch) {
+                            bulkDelSharedRemarks.value = firstMatch;
+                            bulkDelSharedDate.focus();
+                        }
+                    } else {
+                        bulkDelSharedDate.focus();
+                    }
+                }, 150);
+            }
+        });
+
+        function handleBulkDelFocusShift() {
+            setTimeout(() => {
+                const capacity = bulkDelPalletCapacity.value;
+                if (capacity && capacity.trim() !== '') {
+                    bulkDelQtyInput.focus();
+                } else {
+                    bulkDelPalletCapacity.focus();
+                }
+            }, 10);
+        }
+
+        // Datalist selection detection via keyboard native change event
+        bulkDelItemSearch.addEventListener('change', () => {
+            const typedValue = bulkDelItemSearch.value.trim().toLowerCase();
+            const options = Array.from(itemListBulkDatalist.options);
+            const exactMatch = options.some(opt => opt.value.toLowerCase() === typedValue);
+
+            if (exactMatch) {
+                handleBulkDelFocusShift();
+            }
+        });
+
+        // If the user selects an item from the datalist dropdown (e.g. via Click or Enter),
+        // we capture the 'input' event with 'insertReplacementText' and immediately shift focus.
+        bulkDelItemSearch.addEventListener('input', (e) => {
+            const code = bulkDelItemSearch.value.trim();
+            if (!code) return;
+
+            if (palletCapacities[code]) {
+                bulkDelPalletCapacity.value = palletCapacities[code];
+            } else {
+                const row = originalRowsOrder.find(r => r.dataset.code === code);
+                if (row && row.dataset.remarks) {
+                    try {
+                        const remarksArr = JSON.parse(row.dataset.remarks);
+                        if (remarksArr.length > 0) {
+                            const firstRemark = remarksArr[0];
+                            const match = firstRemark.match(/(\d+)\s*PCS\/PLT/i);
+                            if (match && match[1]) {
+                                bulkDelPalletCapacity.value = match[1];
+                                palletCapacities[code] = match[1];
+                                localStorage.setItem('palletCapacities', JSON.stringify(palletCapacities));
+                            }
+                        }
+                    } catch (err) {
+                        console.error("Error parsing remarks for pallet capacity auto-fill", err);
+                    }
+                }
+            }
+
+            // Datalist selection detection
+            if (e.inputType === 'insertReplacementText') {
+                handleBulkDelFocusShift();
+            }
+        });
+
+        bulkDelItemSearch.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === 'Tab') {
+                if (e.key === 'Tab') e.preventDefault(); // allow enter to select datalist item
+
+                setTimeout(() => {
+                    // Prevent shifting focus twice if 'insertReplacementText' or 'change' already handled it
+                    if (document.activeElement === bulkDelQtyInput || document.activeElement === bulkDelPalletCapacity) return;
+
+                    const typedValue = bulkDelItemSearch.value.trim().toLowerCase();
+
+                    if (typedValue) {
+                        let exactMatch = false;
+                        let firstMatch = null;
+
+                        const options = Array.from(itemListBulkDatalist.options);
+                        for (const option of options) {
+                            const optionValue = option.value.toLowerCase();
+                            if (optionValue === typedValue) {
+                                exactMatch = true;
+                                break;
+                            }
+                            if (!firstMatch && optionValue.includes(typedValue)) {
+                                firstMatch = option.value;
+                            }
+                        }
+
+                        if (exactMatch) {
+                            handleBulkDelFocusShift();
+                            return;
+                        }
+
+                        if (!exactMatch && firstMatch) {
+                            bulkDelItemSearch.value = firstMatch;
+
+                            // Manually trigger the input event so capacity is updated if needed
+                            const inputEvent = new Event('input', {
+                                bubbles: true,
+                                cancelable: true,
+                            });
+                            bulkDelItemSearch.dispatchEvent(inputEvent);
+                        }
+                    }
+
+                    const capacity = bulkDelPalletCapacity.value;
+                    if (capacity && capacity.trim() !== '') {
+                        bulkDelQtyInput.focus();
+                    } else {
+                        bulkDelPalletCapacity.focus();
+                    }
+                }, 10);
+            }
         });
 
         bulkDelItemSearch.addEventListener('input', () => {
@@ -1307,6 +1749,13 @@
             }
         });
 
+        bulkDelQtyInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addToListBulkBtn.click();
+            }
+        });
+
         addToListBulkBtn.addEventListener('click', () => {
             const code = bulkDelItemSearch.value.trim();
             let qty = bulkDelQtyInput.value.trim();
@@ -1323,6 +1772,9 @@
 
                 const totalQty = calculateSingleStockingQtyTotal(formatStockingQty(qty));
                 qty = generateBreakdownWithCapacity(totalQty, capacity);
+
+                // Ensure generateBreakdown outputs in the user's preferred standard format (+) before merging
+                qty = qty.replace(/\s*\|\s*/g, '+').replace(/×/g, 'x');
             }
 
             const rem = bulkDelSharedRemarks.value.trim();
@@ -1334,7 +1786,21 @@
             }
             const initialRemark = formattedDate ? (rem ? `${rem} ${formattedDate}` : formattedDate) : rem;
 
-            pendingBulkDeliveries.push({code, qty, remarks: initialRemark});
+            const existingIndex = pendingBulkDeliveries.findIndex(item => item.code === code);
+            if (existingIndex > -1) {
+                if (!isNaN(capacity) && capacity > 0) {
+                    pendingBulkDeliveries[existingIndex].qty = mergeDeliveriesBreakdown(pendingBulkDeliveries[existingIndex].qty, qty, capacity);
+                } else {
+                    pendingBulkDeliveries[existingIndex].qty += '+' + qty;
+                }
+
+                if (initialRemark && !pendingBulkDeliveries[existingIndex].remarks.includes(initialRemark)) {
+                    pendingBulkDeliveries[existingIndex].remarks += ' | ' + initialRemark;
+                }
+            } else {
+                pendingBulkDeliveries.push({code, qty, remarks: initialRemark});
+            }
+
             renderBulkList();
             bulkDelItemSearch.value = '';
             bulkDelQtyInput.value = '';
@@ -1419,6 +1885,18 @@
             applyFiltersAndSort();
         });
 
+        transactionHistoryToggle.addEventListener('click', () => {
+            if (transactionHistoryContent.style.display === 'none') {
+                transactionHistoryContent.style.display = 'block';
+                transactionHistoryIcon.classList.remove('fa-chevron-down');
+                transactionHistoryIcon.classList.add('fa-chevron-up');
+            } else {
+                transactionHistoryContent.style.display = 'none';
+                transactionHistoryIcon.classList.remove('fa-chevron-up');
+                transactionHistoryIcon.classList.add('fa-chevron-down');
+            }
+        });
+
         [historyDateFrom, historyDateTo].forEach(el => el.addEventListener('change', () => renderHistoryLog(searchBar.value.toLowerCase())));
         resetHistoryFilter.addEventListener('click', () => {
             historyDateFrom.value = '';
@@ -1460,107 +1938,246 @@
             localStorage.setItem('userName', userNameInput.value);
         });
 
-        function populateBulkWithdrawList(searchTerm = '') {
-            bulkWithdrawList.innerHTML = '';
-            bulkWithdrawErrorMessage.textContent = '';
-            let itemsWithStock = originalRowsOrder.filter(row => getWithdrawableStock(row) > 0);
-
-            if (searchTerm) {
-                itemsWithStock = itemsWithStock.filter(row =>
-                    row.dataset.code.toLowerCase().includes(searchTerm)
-                );
+        function renderWithdrawList() {
+            if (!pendingBulkWithdrawals.length) {
+                pendingWithdrawalListContainer.innerHTML = '<p style="text-align:center;color:#999;">No items added.</p>';
+                return;
             }
+            pendingWithdrawalListContainer.innerHTML = pendingBulkWithdrawals.map((item, idx) => {
+                const totalWithdrawQty = calculateSingleStockingQtyTotal(formatStockingQty(item.qty));
+                return `
+                <div class="bulk-del-item" style="flex-direction: column; align-items: stretch; gap: 10px; padding: 15px; border: 1px solid #e5e7eb; border-radius: 8px; background: #f9fafb; margin-bottom: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold; font-size: 1.2em;">${item.code}</span>
+                        <button onclick="removeWithdrawalItem(${idx})" style="background: #ef4444; color: white; border: none; border-radius: 6px; padding: 4px 8px; cursor: pointer;"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div class="item-input" style="flex: 1; margin-bottom: 0;">
+                            <label style="font-size: 0.9em; margin-bottom: 4px;" class="withdraw-qty-label">Qty Breakdown:</label>
+                            <input type="text" value="${item.qty}" onchange="updateWithdrawalItemQty(${idx}, this.value, '${item.code}')" style="padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1.1em; font-weight: bold;">
+                        </div>
+                        <div style="white-space: nowrap; font-size: 1.1em; font-weight: bold;" class="withdraw-total-label">
+                            Total: ${totalWithdrawQty.toLocaleString()}
+                        </div>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
 
-            itemsWithStock.sort((a, b) => {
-                const codeA = a.dataset.code;
-                const codeB = b.dataset.code;
-                const hasQtyA = bulkWithdrawQuantities[codeA] && parseFloat(bulkWithdrawQuantities[codeA]) > 0;
-                const hasQtyB = bulkWithdrawQuantities[codeB] && parseFloat(bulkWithdrawQuantities[codeB]) > 0;
-                if (hasQtyA && !hasQtyB) return -1;
-                if (!hasQtyA && hasQtyB) return 1;
-                return 0;
-            });
+        window.removeWithdrawalItem = function(idx) {
+            pendingBulkWithdrawals.splice(idx, 1);
+            renderWithdrawList();
+        };
 
-            if (itemsWithStock.length === 0) {
-                bulkWithdrawList.innerHTML = '<p style="text-align:center; color:grey;">No items match your search.</p>';
+        window.updateWithdrawalItemQty = function(idx, newQtyStr, code) {
+            const row = originalRowsOrder.find(r => r.dataset.code === code);
+            if (!row) return;
+
+            const maxWithdrawable = getWithdrawableStock(row);
+            const newTotal = calculateSingleStockingQtyTotal(formatStockingQty(newQtyStr));
+
+            if (newTotal > maxWithdrawable) {
+                alert(`Cannot withdraw ${newTotal.toLocaleString()}.\nOnly ${maxWithdrawable.toLocaleString()} is available for ${code}.`);
+                // Re-render to revert the input field to the previous valid state
+                renderWithdrawList();
                 return;
             }
 
-            itemsWithStock.forEach(row => {
-                const code = row.dataset.code;
-                const availableStock = getWithdrawableStock(row);
-                const parts = getBreakdownParts(row.dataset.stockingQty);
-                const remarks = JSON.parse(row.dataset.remarks || '[]');
-                const withdrawablePartsHTML = [];
-                parts.forEach((part, index) => {
-                    const remark = (remarks[index] || '').toLowerCase();
-                    if (!remark.startsWith('hold')) {
-                        const colorClass = getColorClassForRemark(remarks[index] || '');
-                        withdrawablePartsHTML.push(`<span class="${colorClass}">${part.trim()}</span>`);
-                    }
-                });
-                const withdrawableBreakdownHTML = withdrawablePartsHTML.join(' | ');
-                const savedQty = bulkWithdrawQuantities[code] || '';
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'bulk-clear-item';
+            if (newTotal <= 0) {
+                alert('Please enter a valid quantity greater than 0.');
+                renderWithdrawList();
+                return;
+            }
 
-                const hasStock = availableStock > 0;
-                const statusDot = hasStock ? '🟢' : '🔴';
-
-                itemDiv.innerHTML = `
-                    <div class="item-info" style="flex-grow: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 5px;">
-                        <label for="bw-qty-${code}" style="font-weight:bold;">${statusDot} ${code}</label>
-                        <div class="item-qty" style="font-size: 0.9em;">
-                            ${withdrawableBreakdownHTML}
-                            <strong class="total-avail-label" style="margin-left: 10px;">(Total Avail: ${availableStock.toLocaleString()})</strong>
-                        </div>
-                    </div>
-                    <input type="text" id="bw-qty-${code}" value="${savedQty}" placeholder="Qty (e.g. 10x50)" data-code="${code}" data-max="${availableStock}" style="width: 140px; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-                `;
-                bulkWithdrawList.appendChild(itemDiv);
-            });
-        }
+            pendingBulkWithdrawals[idx].qty = newQtyStr;
+            renderWithdrawList();
+        };
 
         openBulkWithdrawModalButton.addEventListener('click', () => {
             checkAccess(() => {
-                bulkWithdrawQuantities = {};
-                bulkWithdrawSearch.value = '';
-                populateBulkWithdrawList();
+                itemListWithdrawDatalist.innerHTML = '';
+
+                const sortedRows = [...originalRowsOrder].sort((a, b) => {
+                    const stockA = getWithdrawableStock(a);
+                    const stockB = getWithdrawableStock(b);
+                    if (stockA > 0 && stockB <= 0) return -1;
+                    if (stockA <= 0 && stockB > 0) return 1;
+                    return (a.dataset.code || '').localeCompare(b.dataset.code || '');
+                });
+
+                sortedRows.forEach(row => {
+                    const code = row.dataset.code;
+                    const withdrawableStock = getWithdrawableStock(row);
+                    if (withdrawableStock > 0) {
+                        const option = document.createElement('option');
+                        option.value = code;
+                        option.label = `🟢 Avail: ${withdrawableStock.toLocaleString()}`;
+                        itemListWithdrawDatalist.appendChild(option);
+                    }
+                });
+
+                pendingBulkWithdrawals = [];
+                bulkWithdrawItemSearch.value = '';
+                bulkWithdrawQtyInput.value = '';
+                bulkWithdrawErrorMessage.innerHTML = '';
+                renderWithdrawList();
                 bulkWithdrawModal.style.display = 'block';
+                setTimeout(() => bulkWithdrawItemSearch.focus(), 100);
             });
         });
 
-        bulkWithdrawSearch.addEventListener('input', () => {
-            populateBulkWithdrawList(bulkWithdrawSearch.value.toLowerCase());
-        });
+        const bulkWithdrawInputs = [
+            bulkWithdrawItemSearch,
+            bulkWithdrawQtyInput
+        ];
 
-        bulkWithdrawList.addEventListener('input', (event) => {
-            if (event.target.type === 'text' && event.target.dataset.code) {
-                const code = event.target.dataset.code;
-                const quantity = event.target.value;
-                bulkWithdrawQuantities[code] = quantity;
-
-                const activeElementId = event.target.id;
-                const selectionStart = event.target.selectionStart;
-                const selectionEnd = event.target.selectionEnd;
-
-                populateBulkWithdrawList(bulkWithdrawSearch.value.toLowerCase());
-
-                const newActiveElement = document.getElementById(activeElementId);
-                if (newActiveElement) {
-                    newActiveElement.focus();
-                    newActiveElement.setSelectionRange(selectionStart, selectionEnd);
+        bulkWithdrawInputs.forEach((input, index) => {
+            input.addEventListener('keydown', (e) => {
+                // If it's the search input with a datalist, let native arrow navigation work for the dropdown
+                if (input === bulkWithdrawItemSearch && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+                    return;
                 }
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const nextInput = bulkWithdrawInputs[index + 1];
+                    if (nextInput) {
+                        nextInput.focus();
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const prevInput = bulkWithdrawInputs[index - 1];
+                    if (prevInput) {
+                        prevInput.focus();
+                    }
+                }
+            });
+        });
+
+        // Capture datalist selection explicitly
+        bulkWithdrawItemSearch.addEventListener('input', (e) => {
+            if (e.inputType === 'insertReplacementText') {
+                setTimeout(() => bulkWithdrawQtyInput.focus(), 10);
             }
         });
 
-        bulkWithdrawList.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' && event.target.tagName === 'INPUT' && event.target.type === 'text') {
-                event.preventDefault(); // Prevent form submission if any
-                bulkWithdrawSearch.value = ''; // Clear search box
-                populateBulkWithdrawList(); // Refresh list to show all items
-                bulkWithdrawSearch.focus(); // Move cursor to search box
+        // Capture datalist selection via keyboard change event
+        bulkWithdrawItemSearch.addEventListener('change', () => {
+            const typedValue = bulkWithdrawItemSearch.value.trim().toLowerCase();
+            const options = Array.from(itemListWithdrawDatalist.options);
+            const exactMatch = options.some(opt => opt.value.toLowerCase() === typedValue);
+
+            if (exactMatch) {
+                setTimeout(() => bulkWithdrawQtyInput.focus(), 10);
             }
+        });
+
+        bulkWithdrawItemSearch.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === 'Tab') {
+                if (e.key === 'Tab') e.preventDefault(); // allow enter to select datalist item
+
+                setTimeout(() => {
+                    if (document.activeElement === bulkWithdrawQtyInput) return; // Already focused
+
+                    const typedValue = bulkWithdrawItemSearch.value.trim().toLowerCase();
+
+                    if (typedValue) {
+                        let exactMatch = false;
+                        let firstMatch = null;
+
+                        const options = Array.from(itemListWithdrawDatalist.options);
+                        for (const option of options) {
+                            const optionValue = option.value.toLowerCase();
+                            if (optionValue === typedValue) {
+                                exactMatch = true;
+                                break;
+                            }
+                            if (!firstMatch && optionValue.includes(typedValue)) {
+                                firstMatch = option.value;
+                            }
+                        }
+
+                        if (exactMatch) {
+                            bulkWithdrawQtyInput.focus();
+                            return;
+                        }
+
+                        if (!exactMatch && firstMatch) {
+                            bulkWithdrawItemSearch.value = firstMatch;
+                            bulkWithdrawQtyInput.focus();
+                        }
+                    }
+                }, 150); // increased timeout to let native datalist event win
+            }
+        });
+
+        bulkWithdrawQtyInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addToListWithdrawBtn.click();
+            }
+        });
+
+        addToListWithdrawBtn.addEventListener('click', () => {
+            const code = bulkWithdrawItemSearch.value.trim();
+            const newQtyString = bulkWithdrawQtyInput.value.trim();
+
+            if (!code || !newQtyString) {
+                bulkWithdrawErrorMessage.textContent = 'Material Code and Quantity are required.';
+                return;
+            }
+
+            const row = originalRowsOrder.find(r => r.dataset.code === code);
+            if (!row) {
+                bulkWithdrawErrorMessage.textContent = `Item code ${code} not found.`;
+                return;
+            }
+
+            const maxWithdrawable = getWithdrawableStock(row);
+
+            // Calculate total of what we are TRYING to add right now
+            const newQtyTotal = calculateSingleStockingQtyTotal(formatStockingQty(newQtyString));
+
+            if (newQtyTotal <= 0) {
+                 bulkWithdrawErrorMessage.textContent = 'Please enter a valid quantity greater than 0.';
+                 return;
+            }
+
+            // Check if it already exists in our pending list
+            const existingIndex = pendingBulkWithdrawals.findIndex(item => item.code === code);
+
+            let combinedQtyString = newQtyString;
+            let combinedTotal = newQtyTotal;
+
+            if (existingIndex > -1) {
+                const existingItem = pendingBulkWithdrawals[existingIndex];
+                // Append the new qty string (e.g., "10" + "+50")
+                combinedQtyString = existingItem.qty + "+" + newQtyString;
+                combinedTotal = calculateSingleStockingQtyTotal(formatStockingQty(combinedQtyString));
+            }
+
+            if (combinedTotal > maxWithdrawable) {
+                bulkWithdrawErrorMessage.innerHTML = `Cannot withdraw <strong>${combinedTotal.toLocaleString()}</strong>.<br>Only <strong>${maxWithdrawable.toLocaleString()}</strong> is available for ${code}.`;
+                return;
+            }
+
+            bulkWithdrawErrorMessage.innerHTML = '';
+
+            if (existingIndex > -1) {
+                // Update existing
+                pendingBulkWithdrawals[existingIndex].qty = combinedQtyString;
+            } else {
+                // Add new
+                pendingBulkWithdrawals.push({ code: code, qty: newQtyString });
+            }
+
+            renderWithdrawList();
+
+            // Clear and refocus for sequential entry
+            bulkWithdrawItemSearch.value = '';
+            bulkWithdrawQtyInput.value = '';
+            bulkWithdrawItemSearch.focus();
         });
 
         cancelBulkWithdraw.addEventListener('click', () => {
@@ -1568,41 +2185,29 @@
         });
 
         confirmBulkWithdrawButton.addEventListener('click', () => {
-            const inputs = bulkWithdrawList.querySelectorAll('input[type="text"]');
-            let withdrawalsToProcess = [];
-            let errors = [];
-            inputs.forEach(input => {
-                const qty = calculateSingleStockingQtyTotal(formatStockingQty(input.value));
-                if (qty > 0) {
-                    const code = input.dataset.code;
-                    const maxQty = parseFloat(input.dataset.max);
-                    if (qty > maxQty) {
-                        errors.push(`For ${code}: Cannot withdraw ${qty}. Only ${maxQty} is available.`);
-                    } else {
-                        withdrawalsToProcess.push({ code, qty });
-                    }
-                }
-            });
-            if (errors.length > 0) {
-                bulkWithdrawErrorMessage.innerHTML = errors.join('<br>');
-                return;
-            }
-            if (withdrawalsToProcess.length === 0) {
+            if (pendingBulkWithdrawals.length === 0) {
                 bulkWithdrawErrorMessage.textContent = 'Please enter a quantity for at least one item.';
                 return;
             }
-            if (!confirm(`You are about to withdraw from ${withdrawalsToProcess.length} item(s). Continue?`)) {
+
+            if (!confirm(`You are about to withdraw from ${pendingBulkWithdrawals.length} item(s). Continue?`)) {
                 return;
             }
+
             let successfulWithdrawals = 0;
             let transactionDetails = [];
-            withdrawalsToProcess.forEach(item => {
-                const result = performWithdrawal(item.code, item.qty);
+
+            pendingBulkWithdrawals.forEach(item => {
+                const totalWithdrawQty = calculateSingleStockingQtyTotal(formatStockingQty(item.qty));
+                const result = performWithdrawal(item.code, totalWithdrawQty);
                 if (result.success) {
                     successfulWithdrawals++;
-                    transactionDetails.push(`${item.code} (-${item.qty.toLocaleString()})`);
+                    transactionDetails.push(`${item.code} (-${totalWithdrawQty.toLocaleString()})`);
+                } else {
+                    console.error(result.message);
                 }
             });
+
             if (successfulWithdrawals > 0) {
                 saveInventoryToLocalStorage();
                 applyFiltersAndSort();
