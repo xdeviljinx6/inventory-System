@@ -1361,43 +1361,46 @@
 
         bulkDelItemSearch.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === 'Tab') {
-                e.preventDefault();
-                const typedValue = bulkDelItemSearch.value.trim().toLowerCase();
+                if (e.key === 'Tab') e.preventDefault(); // allow enter to select datalist item
 
-                if (typedValue) {
-                    let exactMatch = false;
-                    let firstMatch = null;
+                setTimeout(() => {
+                    const typedValue = bulkDelItemSearch.value.trim().toLowerCase();
 
-                    const options = Array.from(itemListBulkDatalist.options);
-                    for (const option of options) {
-                        const optionValue = option.value.toLowerCase();
-                        if (optionValue === typedValue) {
-                            exactMatch = true;
-                            break;
+                    if (typedValue) {
+                        let exactMatch = false;
+                        let firstMatch = null;
+
+                        const options = Array.from(itemListBulkDatalist.options);
+                        for (const option of options) {
+                            const optionValue = option.value.toLowerCase();
+                            if (optionValue === typedValue) {
+                                exactMatch = true;
+                                break;
+                            }
+                            if (!firstMatch && optionValue.includes(typedValue)) {
+                                firstMatch = option.value;
+                            }
                         }
-                        if (!firstMatch && optionValue.includes(typedValue)) {
-                            firstMatch = option.value;
+
+                        if (!exactMatch && firstMatch) {
+                            bulkDelItemSearch.value = firstMatch;
+
+                            // Manually trigger the input event so capacity is updated if needed
+                            const inputEvent = new Event('input', {
+                                bubbles: true,
+                                cancelable: true,
+                            });
+                            bulkDelItemSearch.dispatchEvent(inputEvent);
                         }
                     }
 
-                    if (!exactMatch && firstMatch) {
-                        bulkDelItemSearch.value = firstMatch;
-
-                        // Manually trigger the input event so capacity is updated if needed
-                        const inputEvent = new Event('input', {
-                            bubbles: true,
-                            cancelable: true,
-                        });
-                        bulkDelItemSearch.dispatchEvent(inputEvent);
+                    const capacity = bulkDelPalletCapacity.value;
+                    if (capacity && capacity.trim() !== '') {
+                        bulkDelQtyInput.focus();
+                    } else {
+                        bulkDelPalletCapacity.focus();
                     }
-                }
-
-                const capacity = bulkDelPalletCapacity.value;
-                if (capacity && capacity.trim() !== '') {
-                    bulkDelQtyInput.focus();
-                } else {
-                    bulkDelPalletCapacity.focus();
-                }
+                }, 10);
             }
         });
 
@@ -1713,31 +1716,34 @@
 
         bulkWithdrawItemSearch.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === 'Tab') {
-                e.preventDefault();
-                const typedValue = bulkWithdrawItemSearch.value.trim().toLowerCase();
+                if (e.key === 'Tab') e.preventDefault(); // allow enter to select datalist item
 
-                if (typedValue) {
-                    let exactMatch = false;
-                    let firstMatch = null;
+                setTimeout(() => {
+                    const typedValue = bulkWithdrawItemSearch.value.trim().toLowerCase();
 
-                    const options = Array.from(itemListWithdrawDatalist.options);
-                    for (const option of options) {
-                        const optionValue = option.value.toLowerCase();
-                        if (optionValue === typedValue) {
-                            exactMatch = true;
-                            break;
+                    if (typedValue) {
+                        let exactMatch = false;
+                        let firstMatch = null;
+
+                        const options = Array.from(itemListWithdrawDatalist.options);
+                        for (const option of options) {
+                            const optionValue = option.value.toLowerCase();
+                            if (optionValue === typedValue) {
+                                exactMatch = true;
+                                break;
+                            }
+                            if (!firstMatch && optionValue.includes(typedValue)) {
+                                firstMatch = option.value;
+                            }
                         }
-                        if (!firstMatch && optionValue.includes(typedValue)) {
-                            firstMatch = option.value;
+
+                        if (!exactMatch && firstMatch) {
+                            bulkWithdrawItemSearch.value = firstMatch;
                         }
                     }
 
-                    if (!exactMatch && firstMatch) {
-                        bulkWithdrawItemSearch.value = firstMatch;
-                    }
-                }
-
-                bulkWithdrawQtyInput.focus();
+                    bulkWithdrawQtyInput.focus();
+                }, 10);
             }
         });
 
