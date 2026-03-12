@@ -32,13 +32,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Very basic authentication check
-  const authHeader = req.headers.authorization;
-  const expectedPassword = process.env.SYSTEM_PASSWORD || '101010';
-
-  if (!authHeader || authHeader !== `Bearer ${expectedPassword}`) {
-      return res.status(401).json({ error: 'Unauthorized. Incorrect password.' });
-  }
+  // Removed authentication check for GET.
+  // Read operations (loading data) are now public.
 
   try {
     const [inventoryDataStr, transactionHistoryStr, palletCapacitiesStr] = await Promise.all([
