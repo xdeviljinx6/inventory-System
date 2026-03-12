@@ -180,10 +180,19 @@
         .highlight { background-color: #ffeb3b; color: #000; padding: 0 2px; border-radius: 2px; font-weight: bold; }
         body.dark-mode .highlight { background-color: #f59e0b; color: #000; }
 
+        /* Settings Gear Icon */
+        .settings-container { position: absolute; right: 20px; top: 20px; }
+        .settings-btn { background-color: transparent; border: none; font-size: 1.5em; color: #6c757d; cursor: pointer; transition: color 0.2s, transform 0.2s; padding: 5px; }
+        .settings-btn:hover { color: #343a40; transform: rotate(90deg); }
+        body.dark-mode .settings-btn { color: #9ca3af; }
+        body.dark-mode .settings-btn:hover { color: #f3f4f6; }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="settings-container">
+            <button id="openSettingsBtn" class="settings-btn" title="System Settings"><i class="fas fa-cog"></i></button>
+        </div>
         <h1>Cohin Inventory System</h1>
         <div class="info-bar">
             <div class="info-item"> <label for="userName">User:</label> <input type="text" id="userName" placeholder="Your name" style="width: 150px;"> </div>
@@ -294,6 +303,23 @@
             <div class="modal-actions">
                 <button id="compareVarianceButton" style="background-color: #6610f2;">Compare</button>
                 <button id="closeVarianceModalButton" style="background-color: #6c757d;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <h2><i class="fas fa-cog"></i> System Settings</h2>
+            <div class="item-input" style="text-align: left;">
+                <label for="updatePasswordInput">Online Database Password:</label>
+                <input type="password" id="updatePasswordInput" placeholder="Enter Vercel SYSTEM_PASSWORD">
+                <p style="font-size: 0.85em; color: #6c757d; margin-top: 5px; line-height: 1.4;">Update this if you changed the SYSTEM_PASSWORD in your Vercel Environment Variables.</p>
+            </div>
+            <div id="settingsSuccessMessage" class="error-message" style="color: green; min-height: 1.2em;"></div>
+            <div class="modal-actions">
+                <button id="saveSettingsBtn" style="background-color: #28a745;">Save & Reload</button>
+                <button id="closeSettingsBtn" style="background-color: #6c757d;">Close</button>
             </div>
         </div>
     </div>
@@ -573,7 +599,14 @@
         closeVarianceModalButton = document.getElementById('closeVarianceModalButton'),
         transactionHistoryToggle = document.getElementById('transactionHistoryToggle'),
         transactionHistoryContent = document.getElementById('transactionHistoryContent'),
-        transactionHistoryIcon = document.getElementById('transactionHistoryIcon');
+        transactionHistoryIcon = document.getElementById('transactionHistoryIcon'),
+
+        openSettingsBtn = document.getElementById('openSettingsBtn'),
+        settingsModal = document.getElementById('settingsModal'),
+        updatePasswordInput = document.getElementById('updatePasswordInput'),
+        settingsSuccessMessage = document.getElementById('settingsSuccessMessage'),
+        saveSettingsBtn = document.getElementById('saveSettingsBtn'),
+        closeSettingsBtn = document.getElementById('closeSettingsBtn');
 
         let loadedWorkbook = null, originalRowsOrder = [], transactionHistory = [], currentEditingRow = null, pendingAction = null;
         let bulkWithdrawQuantities = {};
@@ -2330,6 +2363,36 @@
 
         closeVarianceModalButton.addEventListener('click', () => {
             varianceModal.style.display = 'none';
+        });
+
+        // Settings Modal Logic
+        openSettingsBtn.addEventListener('click', () => {
+            settingsModal.style.display = 'block';
+            updatePasswordInput.value = localStorage.getItem('systemPassword') || DEFAULT_PASSWORD;
+            settingsSuccessMessage.textContent = '';
+            settingsSuccessMessage.style.color = 'green';
+        });
+
+        closeSettingsBtn.addEventListener('click', () => {
+            settingsModal.style.display = 'none';
+        });
+
+        saveSettingsBtn.addEventListener('click', () => {
+            const newPassword = updatePasswordInput.value.trim();
+            if (newPassword) {
+                localStorage.setItem('systemPassword', newPassword);
+                settingsSuccessMessage.style.color = 'green';
+                settingsSuccessMessage.textContent = 'Password updated locally! Reloading data...';
+
+                // Fetch data using the new password
+                setTimeout(() => {
+                    settingsModal.style.display = 'none';
+                    loadDataFromAPI();
+                }, 1000);
+            } else {
+                settingsSuccessMessage.style.color = 'red';
+                settingsSuccessMessage.textContent = 'Password cannot be empty.';
+            }
         });
 
         compareVarianceButton.addEventListener('click', () => {
